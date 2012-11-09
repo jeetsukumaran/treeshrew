@@ -1,0 +1,17 @@
+.DS_Store
+Makefile.in
+aclocal.m4
+autom4te.cache/
+config.h.in
+configure
+depcomp
+install-sh
+missing
+src/Makefile.in
+build/
+ltmain.sh
+ext/v2.1/
+ext/pytbeaglehon/
+ext/beagle-lib/
+treeshrew_deps_env.sh
+cfgcommand.sh
