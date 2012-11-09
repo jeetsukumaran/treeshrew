@@ -17,9 +17,19 @@ Configuration (assuming 'build_deps.sh' was run):
 
 Building and installing (assuming 'build_deps.sh' was run, and in build subdirectory):
 
-    $ source ../../treeshrew_deps_env.sh
     $ make
     $ make install
+
+Following this recipe will result in all products being installed in
+subdirectory 'installed/' of the build directory. To run the tests:
+
+    $ source ../../treeshrew_deps_env.sh
+    $ installed/opt/treeshrew/test/run-tests.py
+
+If you get an error message regarding missing libraries during the build or
+run, just make sure that the environmental variables are correctly set:
+
+    $ source ../../treeshrew_deps_env.sh
 
 ##############################################################################
 ## treeshrew
