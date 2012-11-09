@@ -27,6 +27,7 @@ Building and installing (assuming 'build_deps.sh' was run, and in build subdirec
 ## Copyright 2012 Jeet Sukumaran.
 ## All rights reserved.
 ##
+## With code contributions from: Mark T. Holder.
 ## See "LICENSE.txt" for terms and conditions of usage.
 ##
 ##############################################################################
