@@ -24,9 +24,11 @@ nobase_dist_treeshrewtests_DATA = \
 	data/basic/pythonidae.tree.newick
 
 COMMON_TREE_SRC = \
+	../src/character.hpp \
+	../src/character.cpp \
 	../src/utility.hpp \
 	../src/utility.cpp \
-	../src/tree.hh \
+	../src/tree.hpp \
 	../src/genetree.hpp \
 	../src/genetree.cpp \
 	../src/dataio.hpp
@@ -44,7 +46,8 @@ treeshrewtests_PROGRAMS = \
 	tree_internal_iter \
 	tree_child_iter \
 	read_dna_alignment \
-	score_phylogenetic_tree
+	score_phylogenetic_tree \
+	benchmark_phylogenetic_tree
 
 phylogenetic_likelihood_calc_SOURCES = \
 	src/phylogenetic_likelihood_calc.cpp
@@ -80,26 +83,17 @@ tree_child_iter_SOURCES = \
 	src/tree_child_iter.cpp
 
 read_dna_alignment_SOURCES = \
+	$(COMMON_TREE_SRC) \
 	$(COMMON_TEST_SRC) \
-	../src/utility.hpp \
-	../src/utility.cpp \
-	../src/character.hpp \
-	../src/character.cpp \
-	../src/tree.hh \
-	../src/genetree.hpp \
-	../src/genetree.cpp \
-	../src/dataio.hpp \
 	src/read_dna_alignment.cpp
 
 score_phylogenetic_tree_SOURCES = \
+	$(COMMON_TREE_SRC) \
 	$(COMMON_TEST_SRC) \
-	../src/utility.hpp \
-	../src/utility.cpp \
-	../src/character.hpp \
-	../src/character.cpp \
-	../src/tree.hh \
-	../src/genetree.hpp \
-	../src/genetree.cpp \
-	../src/dataio.hpp \
 	src/score_phylogenetic_tree.cpp
+
+benchmark_phylogenetic_tree_SOURCES = \
+	$(COMMON_TREE_SRC) \
+	$(COMMON_TEST_SRC) \
+	src/benchmark_phylogenetic_tree.cpp
 
