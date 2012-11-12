@@ -248,7 +248,7 @@ void write_newick_node(TreeType * tree, const iter& tree_iter, std::ostream& out
             if (ch_count > 0) {
                 out << ", ";
             }
-            write_newick_node(tree, tree_iter, out);
+            write_newick_node(tree, chi, out);
         }
         out << ")";
     } else {

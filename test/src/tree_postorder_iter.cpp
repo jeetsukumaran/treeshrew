@@ -12,7 +12,7 @@ int main(int argc, char * argv[]) {
     for (auto & tree : trees) {
         int postorder_count = 0;
         for (auto ndi = tree->postorder_begin(); ndi != tree->postorder_end(); ++ndi, ++postorder_count) {
-            std::cerr << (void*)ndi.node() << ": " << postorder_count << ":" << ndi->get_index() << ": " << ndi->get_label() << std::endl;
+            std::cout << ndi->get_label() << "\t" << std::setprecision(8) << ndi->get_edge_length() << std::endl;
         }
     }
 }
