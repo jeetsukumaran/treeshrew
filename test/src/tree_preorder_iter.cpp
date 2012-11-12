@@ -9,10 +9,9 @@
 int main(int argc, char * argv[]) {
     auto trees = get_trees(argc, argv);
     for (auto & tree : trees) {
-        int postorder_count = 0;
-        for (treeshrew::GeneTreeNode::postorder_iterator ndi = tree->postorder_begin(); ndi != tree->postorder_end(); ++ndi, ++postorder_count) {
-            treeshrew::GeneTreeNode * nd = *ndi;
-            std::cerr << (void*)nd << ": " << postorder_count << ":" << nd->get_index() << ": " << nd->get_label() << std::endl;
+        int preorder_count = 0;
+        for (auto ndi = tree->preorder_begin(); ndi != tree->preorder_end(); ++ndi, ++preorder_count) {
+            std::cerr << (void*)ndi.node() << ": " << preorder_count << ":" << ndi->get_index() << ": " << ndi->get_label() << std::endl;
         }
     }
 }

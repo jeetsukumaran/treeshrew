@@ -98,10 +98,8 @@ void NucleotideSequences::clear() {
 
 void NucleotideSequences::set_tip_data(GeneTree * gene_tree) {
     unsigned long idx=0;
-    for (GeneTreeNode::leaf_iterator leaf_iter = gene_tree->leaf_begin(); leaf_iter != gene_tree->leaf_end(); ++leaf_iter, ++idx) {
-        // std::cerr << "Setting tip '" << leaf_iter->get_label() << "' data (index = " << leaf_iter->get_index() << ")" << std::endl;
-        const std::string& label = (*leaf_iter)->get_label();
-        // TREESHREW_NDEBUG_ASSERT(this->label_sequence_map_.find(label) != this->label_sequence_map_.end());
+    for (auto leaf_iter = gene_tree->leaf_begin(); leaf_iter != gene_tree->leaf_end(); ++leaf_iter, ++idx) {
+        const std::string& label = leaf_iter->get_label();
         NucleotideSequence * seq = this->label_sequence_map_[label];
         if (!seq) {
             treeshrew_abort("Null sequence for taxon '", label, "'");

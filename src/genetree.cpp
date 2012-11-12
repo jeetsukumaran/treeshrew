@@ -5,61 +5,17 @@
 namespace treeshrew {
 
 ////////////////////////////////////////////////////////////////////////////////
-// GeneTreeNodeAllocator
-
-GeneTreeNodeAllocator::GeneTreeNodeAllocator(unsigned long max_nodes, int index_offset) :
-            index_offset_(index_offset) {
-    this->reserve(max_nodes);
-}
-
-GeneTreeNodeAllocator::~GeneTreeNodeAllocator() {
-    this->clear();
-}
-
-void GeneTreeNodeAllocator::clear() {
-    while (this->available_nodes_.size() > 0) {
-        this->available_nodes_.pop();
-    }
-    for (auto nd : this->node_storage_) {
-        if (nd) {
-            delete nd;
-        }
-    }
-    this->node_storage_.clear();
-}
-
-unsigned long GeneTreeNodeAllocator::add_storage(unsigned long count) {
-    for (unsigned long index = 0; index < count; ++index) {
-        int node_index = this->index_offset_ + this->node_storage_.size();
-        GeneTreeNode * node = new GeneTreeNode(nullptr, node_index);
-        this->node_storage_.push_back(node);
-        this->available_nodes_.push(node);
-    }
-    return this->node_storage_.size();
-}
-
-unsigned long GeneTreeNodeAllocator::reserve(unsigned long total) {
-    if (total <= this->node_storage_.size()) {
-        return 0;
-    }
-    unsigned long storage_to_add = total - this->node_storage_.size();
-    this->add_storage(storage_to_add);
-    return storage_to_add;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // GeneTreeNode
 
-
 GeneTree::GeneTree(unsigned long max_tips):
+        Tree<GeneNodeData>(false),
         max_tips_(max_tips),
         leaf_node_allocator_(max_tips * 2, 0),
         internal_node_allocator_(max_tips * 2 + 1, max_tips * 2),
         beagle_instance_(-1),
         beagle_return_info_(nullptr) {
-    this->seed_node_ = this->allocate_internal_node();
-    this->foot_node_ = this->allocate_internal_node();
-    this->seed_node_->set_next_sibling(this->foot_node_);
+    this->create(this->allocate_internal_node(),
+        this->allocate_internal_node());
 }
 
 GeneTree::~GeneTree() {
@@ -143,8 +99,8 @@ int GeneTree::create_beagle_instance(int num_sites) {
     return this->beagle_instance_;
 }
 
-int GeneTree::set_tip_states(GeneTreeNode * tip, int * data) {
-    int beagle_index = tip->get_index() ;
+int GeneTree::set_tip_states(const GeneNodeData& tip, int * data) {
+    int beagle_index = tip.get_index() ;
     int ret_code = beagleSetTipStates(
             this->beagle_instance_,
             beagle_index,
@@ -156,8 +112,8 @@ int GeneTree::set_tip_states(GeneTreeNode * tip, int * data) {
     return ret_code;
 }
 
-int GeneTree::set_tip_partials(GeneTreeNode * tip, double * data) {
-    int beagle_index = tip->get_index() ;
+int GeneTree::set_tip_partials(const GeneNodeData& tip, double * data) {
+    int beagle_index = tip.get_index() ;
     int ret_code = beagleSetTipPartials(
             this->beagle_instance_,
             beagle_index,
@@ -172,10 +128,9 @@ int GeneTree::set_tip_partials(GeneTreeNode * tip, double * data) {
 double GeneTree::calc_ln_probability() {
     std::vector<int> node_indices;
     std::vector<double> edge_lens;
-    for (GeneTreeNode::postorder_iterator ndi = this->postorder_begin(); ndi != this->postorder_end(); ++ndi) {
-        GeneTreeNode * nd = *ndi;
-        node_indices.push_back(nd->get_index());
-        edge_lens.push_back(nd->get_edge_length());
+    for (GeneTree::postorder_iterator ndi = this->postorder_begin(); ndi != this->postorder_end(); ++ndi) {
+        node_indices.push_back(ndi->get_index());
+        edge_lens.push_back(ndi->get_edge_length());
     }
     // tell BEAGLE to populate the transition matrices for the above edge lengthss
     beagleUpdateTransitionMatrices(this->beagle_instance_,     // instance
@@ -197,16 +152,15 @@ double GeneTree::calc_ln_probability() {
     std::vector<BeagleOperation> beagle_operations;
     int ch1_idx = 0;
     int ch2_idx = 0;
-    for (GeneTreeNode::postorder_iterator ndi = this->postorder_begin(); ndi != this->postorder_end(); ++ndi) {
-        GeneTreeNode * nd = *ndi;
-        if (nd->is_leaf()) {
+    for (GeneTree::postorder_iterator ndi = this->postorder_begin(); ndi != this->postorder_end(); ++ndi) {
+        if (ndi.is_leaf()) {
             continue;
         }
-        ch1_idx = nd->get_first_child()->get_index();
-        ch2_idx = nd->get_last_child()->get_index();
+        ch1_idx = ndi.first_child().get_index();
+        ch2_idx = ndi.last_child().get_index();
         // std::cerr << nd->get_index() << ": " << ch1_idx << ", " << ch2_idx << std::endl;
         beagle_operations.push_back(
-                {nd->get_index(), BEAGLE_OP_NONE, BEAGLE_OP_NONE, ch1_idx, ch1_idx, ch2_idx, ch2_idx}
+                {ndi->get_index(), BEAGLE_OP_NONE, BEAGLE_OP_NONE, ch1_idx, ch1_idx, ch2_idx, ch2_idx}
                 );
     }
 
@@ -225,7 +179,7 @@ double GeneTree::calc_ln_probability() {
     // }
 
     double logL = 0;
-    int root_index[1] = {this->seed_node_->get_index()};
+    int root_index[1] = {this->head_node_->data().get_index()};
     int category_weight_index[1] = {0};
     int state_freq_index[1] = {0};
     int cumulative_scale_index[1] = {BEAGLE_OP_NONE};

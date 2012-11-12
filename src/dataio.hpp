@@ -120,7 +120,7 @@ int construct_tree(
         const NxsTaxaBlock * tb,
         const NxsFullTreeDescription & ftd) {
     NxsSimpleTree ncl_tree(ftd, -1, -1.0);
-    auto * root = ttree->get_seed_node();
+    auto * root = ttree->head_node();
     decltype(root) node_parent = nullptr;
     decltype(root) new_node = nullptr;
     std::vector<const NxsSimpleNode *> ncl_nodes = ncl_tree.GetPreorderTraversal();
@@ -148,13 +148,13 @@ int construct_tree(
         } else if (nchildren == 2) {
             label = NxsString::GetEscaped(ncl_node->GetName()).c_str();
             if (!ncl_par) {
-                new_node = ttree->get_seed_node();
+                new_node = ttree->head_node();
             } else {
                 new_node = ttree->allocate_internal_node();
             }
         }
-        new_node->set_label(label);
-        new_node->set_edge_length(edge_len);
+        new_node->data().set_label(label);
+        new_node->data().set_edge_length(edge_len);
         ncl_to_native[ncl_node] = new_node;
         if (ncl_par) {
             if (ncl_to_native.find(ncl_par) == ncl_to_native.end()) {
@@ -236,39 +236,30 @@ int read_from_string(
 ////////////////////////////////////////////////////////////////////////////////
 // Tree Writing Utility Functions
 
-template <class TreeNodeType>
-void write_newick_node(TreeNodeType * node, std::ostream& out) {
-    TREESHREW_NDEBUG_ASSERT(node);
-    if (!node->is_leaf()) {
+template <class TreeType, class iter>
+void write_newick_node(TreeType * tree, const iter& tree_iter, std::ostream& out) {
+    TREESHREW_NDEBUG_ASSERT(tree_iter);
+    if (!tree_iter.is_leaf()) {
         out << "(";
         int ch_count = 0;
-        // std::vector<TreeNodeType *> children;
-        // node->get_children(children);
-        // for (auto & nd : children) {
-        //     if (ch_count > 0) {
-        //         out << ", ";
-        //     }
-        //     ++ch_count;
-        //     write_newick_node(nd, out);
-        // }
-        for (typename TreeNodeType::child_iterator chi = node->children_begin();
-                chi != node->children_end();
+        for (typename TreeType::child_iterator chi = tree->children_begin(tree_iter);
+                chi != tree->children_end(tree_iter);
                 ++chi, ++ch_count) {
             if (ch_count > 0) {
                 out << ", ";
             }
-            write_newick_node(*chi, out);
+            write_newick_node(tree, tree_iter, out);
         }
         out << ")";
     } else {
     }
-    out << node->get_label() << ":" << node->get_edge_length();
+    out << tree_iter->get_label() << ":" << tree_iter->get_edge_length();
 }
 
 template <class TreeType>
 void write_newick(TreeType * tree, std::ostream& out) {
     out << "[&R] ";
-    write_newick_node(tree->get_seed_node(), out);
+    write_newick_node(tree, tree->begin(), out);
     out << ";" << std::endl;
 }
 
