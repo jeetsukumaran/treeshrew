@@ -83,40 +83,21 @@ class TimeLogger {
             } else {
                 rc = new RunClock(operation);
                 this->run_clocks_[operation] = rc;
+                this->operations_.push_back(operation);
                 this->logs_.push_back(rc);
-                this->logs_by_operation_[operation].push_back(rc);
             }
             return rc;
         }
         void summarize(std::ostream& out) {
-            std::sort(this->logs_.begin(), this->logs_.end(), &cmp_results);
-            for (auto rc : this->logs_) {
+            for (auto operation : this->operations_) {
+                auto rc = this->run_clocks_[operation];
                 rc->print(out);
-            }
-        }
-        void summarize_by_operation(std::ostream& out) {
-            for (auto log_by_operation : this->logs_by_operation_) {
-                std::string operation = log_by_operation.first;
-                out << "\n\n### " << operation << " ###\n\n";
-                std::vector<RunClock *> logs = log_by_operation.second;
-                std::sort(logs.begin(), logs.end(), &cmp_results);
-                for (auto rc : logs) {
-                    rc->print(out);
-                }
-            }
-        }
-        void summarize_best_by_operation(std::ostream& out) {
-            for (auto log_by_operation : this->logs_by_operation_) {
-                std::string operation = log_by_operation.first;
-                std::vector<RunClock *> logs = log_by_operation.second;
-                std::sort(logs.begin(), logs.end(), &cmp_results);
-                (*logs.begin())->print(out);
             }
         }
 
     private:
         std::vector<RunClock *>                        logs_;
-        std::map<std::string, std::vector<RunClock *>> logs_by_operation_;
+        std::vector<std::string>                       operations_;
         std::map<std::string, RunClock *>              run_clocks_;
 
 }; // TimeLogger
