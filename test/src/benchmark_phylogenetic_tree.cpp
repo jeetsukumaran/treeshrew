@@ -149,32 +149,37 @@ void run_child_iteration(const std::vector<treeshrew::GeneTree *>& trees,
         TimeLogger& time_logger,
         unsigned long nreps) {
     RunClock * clock = nullptr;
-    for (auto & tree : trees) {
-        clock = time_logger.get_timer("Child Iteration");
-        clock->start();
-        for (treeshrew::GeneTreeNode::postorder_iterator ndi = tree->postorder_begin(); ndi != tree->postorder_end(); ++ndi) {
-            auto node = *ndi;
-            for (treeshrew::GeneTreeNode::child_iterator chi = node->children_begin();
-                    chi != node->children_end();
-                    ++chi) {
+    for (unsigned long i = 0; i < nreps; ++i) {
+        for (auto & tree : trees) {
+            clock = time_logger.get_timer("Child Iteration");
+            clock->start();
+            for (treeshrew::GeneTreeNode::postorder_iterator ndi = tree->postorder_begin(); ndi != tree->postorder_end(); ++ndi) {
+                auto node = *ndi;
+                for (treeshrew::GeneTreeNode::child_iterator chi = node->children_begin();
+                        chi != node->children_end();
+                        ++chi) {
+                }
             }
+            clock->stop();
         }
-        clock->stop();
     }
 }
 
-void score_tree(
+void run_tree_scoring(
         std::vector<treeshrew::GeneTree *>& trees,
         treeshrew::NucleotideSequences& data,
         TimeLogger& time_logger,
         unsigned long nreps) {
     RunClock * clock = nullptr;
-    for (auto & tree : trees) {
-        clock = time_logger.get_timer("Likelihood");
-        clock->start();
-        data.set_tip_data(tree);
-        tree->calc_ln_probability();
-        clock->stop();
+    for (unsigned long i = 0; i < nreps; ++i) {
+        for (auto & tree : trees) {
+            clock = time_logger.get_timer("Likelihood");
+            clock->start();
+            tree->create_beagle_instance(data.get_num_sites());
+            data.set_tip_data(tree);
+            tree->calc_ln_probability();
+            clock->stop();
+        }
     }
 }
 
@@ -200,6 +205,7 @@ int main(int argc, char * argv[]) {
     run_postorder_iteration(trees, time_logger, nreps);
     run_leaf_iteration(trees, time_logger, nreps);
     run_child_iteration(trees, time_logger, nreps);
+    run_tree_scoring(trees, data, time_logger, nreps);
 
     time_logger.summarize(std::cout);
 }
