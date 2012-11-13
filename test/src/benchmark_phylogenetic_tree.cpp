@@ -123,7 +123,7 @@ void run_postorder_iteration(const std::vector<treeshrew::GeneTree *>& trees,
         for (auto & tree : trees) {
             clock = time_logger.get_timer("Postorder Iteration");
             clock->start();
-            for (treeshrew::GeneTreeNode::postorder_iterator ndi = tree->postorder_begin(); ndi != tree->postorder_end(); ++ndi) {
+        for (auto ndi = tree->postorder_begin(); ndi != tree->postorder_end(); ++ndi) {
             }
             clock->stop();
         }
@@ -138,7 +138,7 @@ void run_leaf_iteration(const std::vector<treeshrew::GeneTree *>& trees,
         for (auto & tree : trees) {
             clock = time_logger.get_timer("Leaf Iteration");
             clock->start();
-            for (treeshrew::GeneTreeNode::leaf_iterator ndi = tree->leaf_begin(); ndi != tree->leaf_end(); ++ndi) {
+            for (auto ndi = tree->leaf_begin(); ndi != tree->leaf_end(); ++ndi) {
             }
             clock->stop();
         }
@@ -153,10 +153,9 @@ void run_child_iteration(const std::vector<treeshrew::GeneTree *>& trees,
         for (auto & tree : trees) {
             clock = time_logger.get_timer("Child Iteration");
             clock->start();
-            for (treeshrew::GeneTreeNode::postorder_iterator ndi = tree->postorder_begin(); ndi != tree->postorder_end(); ++ndi) {
-                auto node = *ndi;
-                for (treeshrew::GeneTreeNode::child_iterator chi = node->children_begin();
-                        chi != node->children_end();
+            for (auto ndi = tree->postorder_begin(); ndi != tree->postorder_end(); ++ndi) {
+                for (auto chi = tree->children_begin(ndi);
+                        chi != tree->children_end(ndi);
                         ++chi) {
                 }
             }
