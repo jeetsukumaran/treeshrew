@@ -169,7 +169,7 @@ void run_child_iteration(const std::vector<treeshrew::GeneTree *>& trees,
         unsigned long nreps) {
     RunClock * clock = nullptr;
     for (auto & tree : trees) {
-        clock = time_logger.get_timer("Leaf Iteration");
+        clock = time_logger.get_timer("Child Iteration");
         clock->start();
         for (treeshrew::GeneTreeNode::postorder_iterator ndi = tree->postorder_begin(); ndi != tree->postorder_end(); ++ndi) {
             auto node = *ndi;
@@ -178,6 +178,21 @@ void run_child_iteration(const std::vector<treeshrew::GeneTree *>& trees,
                     ++chi) {
             }
         }
+        clock->stop();
+    }
+}
+
+void score_tree(
+        std::vector<treeshrew::GeneTree *>& trees,
+        treeshrew::NucleotideSequences& data,
+        TimeLogger& time_logger,
+        unsigned long nreps) {
+    RunClock * clock = nullptr;
+    for (auto & tree : trees) {
+        clock = time_logger.get_timer("Likelihood");
+        clock->start();
+        data.set_tip_data(tree);
+        tree->calc_ln_probability();
         clock->stop();
     }
 }
