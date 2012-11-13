@@ -4,19 +4,21 @@
 #include <iomanip>
 #include <chrono>
 #include <algorithm>
+#include <sstream>
 #include "../../src/dataio.hpp"
 #include "../../src/character.hpp"
 #include "../../src/genetree.hpp"
 #include "../../src/utility.hpp"
 #include "testutils.hpp"
 
-#define DEFAULT_NREPS  100
+#define DEFAULT_NREPS  1
 
 class RunClock {
     typedef std::chrono::time_point<std::chrono::high_resolution_clock> TimePointType;
     public:
         RunClock(const std::string& operation)
             : operation_(operation)
+            , mean_elapsed_microseconds_(-1)
             , mean_elapsed_seconds_(-1) {
         }
         void start() {
@@ -28,25 +30,32 @@ class RunClock {
             unsigned long ms = std::chrono::duration_cast<std::chrono::microseconds>(end - this->begin_).count();
             this->elapsed_microseconds_.push_back(ms);
         }
-        double get_mean_elapsed_seconds() {
-            if (this->mean_elapsed_seconds_ < 0) {
+        double get_mean_elapsed_microseconds() {
+            if (this->mean_elapsed_microseconds_ < 0) {
                 unsigned long total_microseconds = 0;
                 for (auto ms : this->elapsed_microseconds_) {
                     total_microseconds += ms;
                 }
-                this->mean_elapsed_seconds_ = static_cast<double>(total_microseconds) / (static_cast<double>(this->elapsed_microseconds_.size()) * 1e6);
+                this->mean_elapsed_microseconds_ = static_cast<double>(total_microseconds) / (static_cast<double>(this->elapsed_microseconds_.size()));
+            }
+            return this->mean_elapsed_microseconds_;
+        }
+        double get_mean_elapsed_seconds() {
+            if (this->mean_elapsed_seconds_ < 0) {
+                this->mean_elapsed_seconds_ = static_cast<double>(this->get_mean_elapsed_microseconds()) / (1e6);
             }
             return this->mean_elapsed_seconds_;
         }
         void print(std::ostream& out) {
             out << std::setw(25) << std::left << this->operation_ << " ";
-            out << this->get_mean_elapsed_seconds() << std::endl;
+            out << std::setprecision(12) << this->get_mean_elapsed_microseconds() << std::endl;
         }
 
     private:
         std::string                 operation_;
         TimePointType               begin_;
         std::vector<unsigned long>  elapsed_microseconds_;
+        double                      mean_elapsed_microseconds_;
         double                      mean_elapsed_seconds_;
 }; // RunClock
 
@@ -112,6 +121,67 @@ class TimeLogger {
 
 }; // TimeLogger
 
+void run_tree_construction(const std::string& tree_filepath,
+        TimeLogger& time_logger,
+        unsigned long nreps) {
+    RunClock * clock = nullptr;
+    for (unsigned long i = 0; i < nreps; ++i) {
+        std::vector<treeshrew::GeneTree *> trees;
+        clock = time_logger.get_timer("Tree Construction");
+        clock->start();
+        treeshrew::treeio::read_from_filepath(trees, tree_filepath, "newick");
+        clock->stop();
+    }
+}
+
+void run_postorder_iteration(const std::vector<treeshrew::GeneTree *>& trees,
+        TimeLogger& time_logger,
+        unsigned long nreps) {
+    RunClock * clock = nullptr;
+    for (unsigned long i = 0; i < nreps; ++i) {
+        for (auto & tree : trees) {
+            clock = time_logger.get_timer("Postorder Iteration");
+            clock->start();
+            for (treeshrew::GeneTreeNode::postorder_iterator ndi = tree->postorder_begin(); ndi != tree->postorder_end(); ++ndi) {
+            }
+            clock->stop();
+        }
+    }
+}
+
+void run_leaf_iteration(const std::vector<treeshrew::GeneTree *>& trees,
+        TimeLogger& time_logger,
+        unsigned long nreps) {
+    RunClock * clock = nullptr;
+    for (unsigned long i = 0; i < nreps; ++i) {
+        for (auto & tree : trees) {
+            clock = time_logger.get_timer("Leaf Iteration");
+            clock->start();
+            for (treeshrew::GeneTreeNode::leaf_iterator ndi = tree->leaf_begin(); ndi != tree->leaf_end(); ++ndi) {
+            }
+            clock->stop();
+        }
+    }
+}
+
+void run_child_iteration(const std::vector<treeshrew::GeneTree *>& trees,
+        TimeLogger& time_logger,
+        unsigned long nreps) {
+    RunClock * clock = nullptr;
+    for (auto & tree : trees) {
+        clock = time_logger.get_timer("Leaf Iteration");
+        clock->start();
+        for (treeshrew::GeneTreeNode::postorder_iterator ndi = tree->postorder_begin(); ndi != tree->postorder_end(); ++ndi) {
+            auto node = *ndi;
+            for (treeshrew::GeneTreeNode::child_iterator chi = node->children_begin();
+                    chi != node->children_end();
+                    ++chi) {
+            }
+        }
+        clock->stop();
+    }
+}
+
 int main(int argc, char * argv[]) {
     if (argc < 3) {
         std::cerr << "Usage: " << argv[0] << " <NEWICK-TREEFILE> <FASTA-DATAFILE>" << std::endl;
@@ -119,10 +189,23 @@ int main(int argc, char * argv[]) {
     }
     std::string tree_filepath(argv[1]);
     std::string data_filepath(argv[2]);
-    std::vector<treeshrew::GeneTree *> trees;
-    treeshrew::treeio::read_from_filepath(trees, tree_filepath, "newick");
+    unsigned long nreps = DEFAULT_NREPS;
+    if (argc >= 4) {
+        std::istringstream(argv[3]) >> nreps;
+    }
+
     treeshrew::NucleotideSequences data;
     treeshrew::sequenceio::read_from_filepath(data, data_filepath, "fasta");
+    std::vector<treeshrew::GeneTree *> trees;
+    treeshrew::treeio::read_from_filepath(trees, tree_filepath, "newick");
+
+    TimeLogger time_logger;
+    run_tree_construction(tree_filepath, time_logger, nreps);
+    run_postorder_iteration(trees, time_logger, nreps);
+    run_leaf_iteration(trees, time_logger, nreps);
+    run_child_iteration(trees, time_logger, nreps);
+
+    time_logger.summarize(std::cout);
 }
 
 
