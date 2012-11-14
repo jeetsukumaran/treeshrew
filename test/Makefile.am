@@ -48,7 +48,8 @@ treeshrewtests_PROGRAMS = \
 	tree_child_iter \
 	read_dna_alignment \
 	score_phylogenetic_tree \
-	benchmark_phylogenetic_tree
+	benchmark_phylogenetic_tree \
+	calc_hamming_distance
 
 check_gsl_installation_SOURCES = \
 	src/check_gsl_installation.cpp
@@ -100,4 +101,9 @@ benchmark_phylogenetic_tree_SOURCES = \
 	$(COMMON_TREE_SRC) \
 	$(COMMON_TEST_SRC) \
 	src/benchmark_phylogenetic_tree.cpp
+
+calc_hamming_distance_SOURCES = \
+	$(COMMON_TREE_SRC) \
+	$(COMMON_TEST_SRC) \
+	src/calc_hamming_distance.cpp
 
