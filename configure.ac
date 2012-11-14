@@ -83,9 +83,9 @@ if ! test -d "$BEAGLE_HOME/include/libhmsbeagle-1" ; then
     AC_MSG_ERROR([beagle is a prerequisite for building. Use the --with-beagle argument to configure to specify beagle's prefix directory.])
 fi
 
-LIBS="$LIBS -lncl -lhmsbeagle -lgsl"
+LIBS="$LIBS -lncl -lhmsbeagle -lgsl -lgslcblas"
 LDFLAGS="$LDFLAGS -L$NCL_LIB_DIR -L$BEAGLE_HOME/lib -L$GSL_LIB_DIR"
-CPPFLAGS="-I$NCL_INC_DIR -I$BEAGLE_HOME/include/libhmsbeagle-1 -I$GSL_INC_DIR"
+CPPFLAGS="-I$NCL_INC_DIR -I$BEAGLE_HOME/include/libhmsbeagle-1 -I$GSL_INC_DIR -DHAVE_INLINE"
 AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 
