@@ -8,6 +8,8 @@ then
     unset BEAGLE_PREFIX
     unset NCL_ROOT
     unset NCL_PREFIX
+    unset GSL_ROOT
+    unset GSL_PREFIX
 fi
 
 env_filename='treeshrew_deps_env.sh'
@@ -26,6 +28,57 @@ echo $OSTYPE | grep darwin >/dev/null
 is_linux=$?
 
 export MAKE="make"
+
+################################################################################
+# GSL
+################################################################################
+if test -z $GSL_PREFIX
+then
+    if test -z $GSL_ROOT
+    then
+        cd $LIB_ROOT
+        if ! test -d gsl-1.15
+        then
+            tar xvf ../gsl/gsl-1.15.tar.gz
+        fi
+        GSL_ROOT="$LIB_ROOT/gsl-1.15"
+    fi
+    echo "export GSL_ROOT=${GSL_ROOT}" >> "${env_filename}"
+    cd "$GSL_ROOT" || exit 1
+    mkdir build
+    sh "./autogen.sh" || exit 1
+    cd build
+    export GSL_PREFIX="${GSL_ROOT}/installed"
+    ../configure --prefix="${GSL_PREFIX}" || exit 1
+    ${MAKE} || exit 1
+    ${MAKE} install || exit 1
+    if test ${is_linux} -eq 0
+    then
+        export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${GSL_PREFIX}/lib"
+    else
+        export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${GSL_PREFIX}/lib"
+    fi
+    ${MAKE} check || exit
+    cd $TREESHREW_ROOT
+else
+    if test ${is_linux} -eq 0
+    then
+        export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${GSL_PREFIX}/lib"
+    else
+        export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${GSL_PREFIX}/lib"
+    fi
+fi
+echo "export GSL_PREFIX=${GSL_PREFIX}" >> "${env_filename}"
+if test ${is_linux} -eq 0
+then
+    echo 'export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${GSL_PREFIX}/lib"' >> "${env_filename}"
+else
+    echo 'export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${GSL_PREFIX}/lib"' >> "${env_filename}"
+fi
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:${GSL_PREFIX}/lib/pkgconfig"
+echo 'export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:${GSL_PREFIX}/lib/pkgconfig"' >> "${env_filename}"
+
+
 ################################################################################
 # BEAGLE
 ################################################################################
@@ -129,6 +182,10 @@ then
 else
     echo 'export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${NCL_PREFIX}/lib/ncl"'>> "${env_filename}"
 fi
+
+################################################################################
+# Convenience
+################################################################################
 
 cat << 'EOF' > cfgcommand.sh
 #! /bin/bash

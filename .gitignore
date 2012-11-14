@@ -12,6 +12,7 @@ build/
 ltmain.sh
 ext/v2.1/
 ext/pytbeaglehon/
+ext/gsl-1.15
 ext/beagle-lib/
 treeshrew_deps_env.sh
 cfgcommand.sh
