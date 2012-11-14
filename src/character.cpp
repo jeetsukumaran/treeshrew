@@ -3,6 +3,32 @@
 namespace treeshrew {
 
 //////////////////////////////////////////////////////////////////////////////
+// Utility Functions
+
+unsigned long hamming_distance(const CharacterStateVectorType::const_iterator& short_read_begin,
+        const CharacterStateVectorType::const_iterator& short_read_end,
+        const CharacterStateVectorType::const_iterator& long_read_begin) {
+    return std::inner_product(
+            short_read_begin, short_read_end, long_read_begin,
+            0, std::plus<unsigned int>(),
+            std::not2(std::equal_to<std::string::value_type>()));
+}
+
+unsigned long sliding_hamming_distance(const CharacterStateVectorType& short_read,
+        const CharacterStateVectorType& long_read) {
+    CharacterStateVectorType::const_iterator start_pos = long_read.begin();
+    CharacterStateVectorType::const_iterator stop_pos = long_read.end() - short_read.size() + 1;
+    assert(stop_pos >= start_pos);
+    unsigned long d = 0;
+    while (start_pos < stop_pos) {
+        d += hamming_distance(short_read.begin(), short_read.end(), start_pos);
+        ++start_pos;
+    }
+    return d;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
 // NucleotideSequence
 
 std::map<char, CharacterStateType> NucleotideSequence::symbol_to_state_map_ {

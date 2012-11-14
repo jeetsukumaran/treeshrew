@@ -8,13 +8,34 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <numeric>    //inner_product
+#include <functional> //plus, equal_to, not2
 #include "genetree.hpp"
 #include "utility.hpp"
 
 namespace treeshrew {
 
+//////////////////////////////////////////////////////////////////////////////
+// Typedefs
+
 typedef int CharacterStateType;
 typedef std::vector<CharacterStateType> CharacterStateVectorType;
+
+//////////////////////////////////////////////////////////////////////////////
+// Utility Functions
+
+// Assumes that ``long_read_begin`` sequence is at least as long as ``short_read_begin`` to
+// ``short_read_end``.
+unsigned long hamming_distance(const CharacterStateVectorType::const_iterator& short_read_begin,
+        const CharacterStateVectorType::const_iterator& short_read_end,
+        const CharacterStateVectorType::const_iterator& long_read_begin);
+
+// Assumes that ``long_read`` sequence is at least as long as ``short_read``
+unsigned long sliding_hamming_distance(const CharacterStateVectorType& short_read,
+        const CharacterStateVectorType& long_read);
+
+//////////////////////////////////////////////////////////////////////////////
+// NucleotideSequence
 
 class NucleotideSequence {
 
@@ -93,6 +114,8 @@ class NucleotideSequence {
 
 }; // NucleotideSequence
 
+//////////////////////////////////////////////////////////////////////////////
+// NucleotideSequences
 
 class NucleotideSequences {
 
