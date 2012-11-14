@@ -38,6 +38,7 @@ COMMON_TEST_SRC = \
 	src/testutils.cpp
 
 treeshrewtests_PROGRAMS = \
+	check_gsl_installation \
 	phylogenetic_likelihood_calc \
 	read_tree \
 	tree_postorder_iter \
@@ -48,6 +49,9 @@ treeshrewtests_PROGRAMS = \
 	read_dna_alignment \
 	score_phylogenetic_tree \
 	benchmark_phylogenetic_tree
+
+check_gsl_installation_SOURCES = \
+	src/check_gsl_installation.cpp
 
 phylogenetic_likelihood_calc_SOURCES = \
 	src/phylogenetic_likelihood_calc.cpp
