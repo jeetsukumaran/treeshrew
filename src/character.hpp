@@ -147,7 +147,7 @@ class ShortReadSequence {
                 num_mismatches = std::inner_product(
                         this->begin_, this->end_, start_pos,
                         0, std::plus<unsigned int>(),
-                        std::not2(std::equal_to<std::string::value_type>()));
+                        std::not2(std::equal_to<CharacterStateVectorType::value_type>()));
                 prob += gsl_ran_binomial_pdf(num_mismatches, error_probability, this->size_);
                 ++start_pos;
             }

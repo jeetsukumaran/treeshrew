@@ -11,7 +11,7 @@ unsigned long hamming_distance(const CharacterStateVectorType::const_iterator& s
     return std::inner_product(
             short_read_begin, short_read_end, long_read_begin,
             0, std::plus<unsigned int>(),
-            std::not2(std::equal_to<std::string::value_type>()));
+            std::not2(std::equal_to<CharacterStateVectorType::value_type>()));
 }
 
 unsigned long sliding_hamming_distance(const CharacterStateVectorType& short_read,
