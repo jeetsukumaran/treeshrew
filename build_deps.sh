@@ -46,11 +46,12 @@ then
     echo "export GSL_ROOT=${GSL_ROOT}" >> "${env_filename}"
     cd "$GSL_ROOT" || exit 1
     mkdir build
+    autoreconf -i -f -v
     autoreconf
     sh "./autogen.sh" || exit 1
     cd build
     export GSL_PREFIX="${GSL_ROOT}/installed"
-    ../configure --prefix="${GSL_PREFIX}" || exit 1
+    ../configure  --enable-maintainer-mode --prefix="${GSL_PREFIX}" || exit 1
     ${MAKE} || exit 1
     ${MAKE} install || exit 1
     if test ${is_linux} -eq 0
