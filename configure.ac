@@ -27,6 +27,29 @@ NCL_INC_DIR="/usr/local/include"
 NCL_LIB_DIR="/usr/local/lib"
 NCL_BIN_DIR="/usr/local/bin"
 
+# GSL ######################################################
+# AC_CHECK_LIB([m],[cos])
+# AC_CHECK_LIB([gslcblas],[cblas_dgemm])
+# AC_CHECK_LIB([gsl],[gsl_blas_dgemm])
+# GSL ######################################################
+
+AC_ARG_WITH(
+	[gsl],
+	AC_HELP_STRING(
+		[--with-gsl=DIR],
+		[Specify the root directory for the GNU Scientific Library (GSL).  Omit this flag and configure will look for a system level GSL installation.]
+		),
+	[
+	if ! test "$withval" = "yes" -o "$withval" = "no" ; then
+		GSL_INC_DIR="$withval/include"
+		GSL_LIB_DIR="$withval/lib"
+		GSL_BIN_DIR="$withval/bin"
+	fi
+	])
+if ! test -f "$GSL_INC_DIR/gsl/gsl_math.h" ; then
+    AC_MSG_ERROR([GSL is a prerequisite for building. Use the --with-gsl argument to configure to specify GSL's prefix directory.])
+fi
+
 AC_ARG_WITH(
 	[ncl],
 	AC_HELP_STRING(
@@ -49,7 +72,7 @@ AC_ARG_WITH(
 	[beagle],
 	AC_HELP_STRING(
 		[--with-beagle=DIR],
-		[Specify the root directory for the beagle]
+		[Specify the root directory for beagle]
 		),
 	[
 	if ! test "$withval" = "yes" -o "$withval" = "no" ; then
@@ -60,9 +83,9 @@ if ! test -d "$BEAGLE_HOME/include/libhmsbeagle-1" ; then
     AC_MSG_ERROR([beagle is a prerequisite for building. Use the --with-beagle argument to configure to specify beagle's prefix directory.])
 fi
 
-LIBS="$LIBS -lncl -lhmsbeagle"
-LDFLAGS="$LDFLAGS -L$NCL_LIB_DIR -L$BEAGLE_HOME/lib"
-CPPFLAGS="-I$NCL_INC_DIR -I$BEAGLE_HOME/include/libhmsbeagle-1"
+LIBS="$LIBS -lncl -lhmsbeagle -lgsl"
+LDFLAGS="$LDFLAGS -L$NCL_LIB_DIR -L$BEAGLE_HOME/lib -L$GSL_LIB_DIR"
+CPPFLAGS="-I$NCL_INC_DIR -I$BEAGLE_HOME/include/libhmsbeagle-1 -I$GSL_INC_DIR"
 AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 

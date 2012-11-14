@@ -198,18 +198,18 @@ then
 fi
 if [[ $1 == "release" ]]
 then
-    CXXFLAGS="-O3 -Wall" ${SCRIPT_DIR}/configure --prefix=`pwd`/installed "--with-ncl=${NCL_PREFIX}" "--with-beagle=${BEAGLE_PREFIX}"
+    CXXFLAGS="-O3 -Wall" ${SCRIPT_DIR}/configure --prefix=`pwd`/installed "--with-ncl=${NCL_PREFIX}" "--with-beagle=${BEAGLE_PREFIX}" "--with-gsl=${GSL_PREFIX}"
     echo
     echo ---
     echo Release configuration complete.
 elif [[ $1 == "profile" ]]
 then
-    CXXFLAGS="-O3 -pg -g -Wall" ${SCRIPT_DIR}/configure --prefix=`pwd`/installed "--with-ncl=${NCL_PREFIX}" "--with-beagle=${BEAGLE_PREFIX}"
+    CXXFLAGS="-O3 -pg -g -Wall" ${SCRIPT_DIR}/configure --prefix=`pwd`/installed "--with-ncl=${NCL_PREFIX}" "--with-beagle=${BEAGLE_PREFIX}" "--with-gsl=${GSL_PREFIX}"
     echo
     echo ---
     echo Release configuration complete.
 else
-    CXXFLAGS="-g -O0 -Wall -DTREESHREW_DEBUG_PRINTING -DDEBUGGING_MODE" ${SCRIPT_DIR}/configure --prefix=`pwd`/installed "--with-ncl=${NCL_PREFIX}" "--with-beagle=${BEAGLE_PREFIX}"
+    CXXFLAGS="-g -O0 -Wall -DTREESHREW_DEBUG_PRINTING -DDEBUGGING_MODE" ${SCRIPT_DIR}/configure --prefix=`pwd`/installed "--with-ncl=${NCL_PREFIX}" "--with-beagle=${BEAGLE_PREFIX}" "--with-gsl=${GSL_PREFIX}"
     echo
     echo ---
     echo Debugging configuration complete.
