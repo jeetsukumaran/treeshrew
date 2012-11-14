@@ -46,6 +46,7 @@ then
     echo "export GSL_ROOT=${GSL_ROOT}" >> "${env_filename}"
     cd "$GSL_ROOT" || exit 1
     mkdir build
+    autoreconf
     sh "./autogen.sh" || exit 1
     cd build
     export GSL_PREFIX="${GSL_ROOT}/installed"
