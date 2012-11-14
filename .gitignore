@@ -16,3 +16,6 @@ ext/gsl-1.15
 ext/beagle-lib/
 treeshrew_deps_env.sh
 cfgcommand.sh
+config.h.in~
+config.guess
+config.sub
