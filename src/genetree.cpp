@@ -99,7 +99,7 @@ int GeneTree::create_beagle_instance(int num_sites) {
     return this->beagle_instance_;
 }
 
-int GeneTree::set_tip_states(const GeneNodeData& tip, int * data) {
+int GeneTree::set_tip_states(const GeneNodeData& tip, const int * data) {
     int beagle_index = tip.get_index() ;
     int ret_code = beagleSetTipStates(
             this->beagle_instance_,
@@ -112,7 +112,7 @@ int GeneTree::set_tip_states(const GeneNodeData& tip, int * data) {
     return ret_code;
 }
 
-int GeneTree::set_tip_partials(const GeneNodeData& tip, double * data) {
+int GeneTree::set_tip_partials(const GeneNodeData& tip, const double * data) {
     int beagle_index = tip.get_index() ;
     int ret_code = beagleSetTipPartials(
             this->beagle_instance_,

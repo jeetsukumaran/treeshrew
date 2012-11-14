@@ -10,6 +10,7 @@
 #include <map>
 #include <numeric>    //inner_product
 #include <functional> //plus, equal_to, not2
+#include <gsl/gsl_randist.h>
 #include "genetree.hpp"
 #include "utility.hpp"
 
@@ -49,6 +50,12 @@ class NucleotideSequence {
         unsigned long size() {
             return this->sequence_.size();
         }
+        const CharacterStateVectorType::const_iterator begin() const {
+            return this->sequence_.begin();
+        }
+        const CharacterStateVectorType::const_iterator end() const {
+            return this->sequence_.end();
+        }
         void append_state(CharacterStateType c) {
             this->sequence_.push_back(c);
         }
@@ -64,10 +71,10 @@ class NucleotideSequence {
                 this->append_state_by_symbol(c);
             }
         }
-        CharacterStateType * state_data() {
+        const CharacterStateType * state_data() const {
             return this->sequence_.data();
         }
-        double * partials_data() {
+        const double * partials_data() const {
             return this->partials_.data();
         }
         const std::string& get_label() const {
@@ -84,7 +91,7 @@ class NucleotideSequence {
             return out.str();
         }
 
-    private:
+    protected:
         std::string                 label_;
         CharacterStateVectorType    sequence_;
         std::vector<double>         partials_;
@@ -113,6 +120,48 @@ class NucleotideSequence {
         }
 
 }; // NucleotideSequence
+
+//////////////////////////////////////////////////////////////////////////////
+// ShortReadSequence
+
+class ShortReadSequence {
+
+    public:
+        ShortReadSequence(const NucleotideSequence& seq)
+            : sequence_(seq.begin(), seq.end()) {
+            this->begin_ = this->sequence_.begin();
+            this->end_ = this->sequence_.end();
+            this->size_ = this->sequence_.size();
+        }
+
+        inline double calc_probability_of_sequence(
+                const CharacterStateVectorType::const_iterator& long_read_begin,
+                const CharacterStateVectorType::const_iterator& long_read_end,
+                const NucleotideSequence * long_read, double error_probability) {
+            CharacterStateVectorType::const_iterator start_pos = long_read_begin;
+            CharacterStateVectorType::const_iterator stop_pos = long_read_end - this->size_ + 1;
+            assert(stop_pos >= start_pos);
+            unsigned long num_mismatches = 0;
+            double prob = 0.0;
+            while (start_pos < stop_pos) {
+                num_mismatches = std::inner_product(
+                        this->begin_, this->end_, start_pos,
+                        0, std::plus<unsigned int>(),
+                        std::not2(std::equal_to<std::string::value_type>()));
+                prob += gsl_ran_binomial_pdf(num_mismatches, error_probability, this->size_);
+                ++start_pos;
+            }
+            return std::log(prob);
+        }
+
+    private:
+        CharacterStateVectorType                    sequence_;
+        CharacterStateVectorType::const_iterator    begin_;
+        CharacterStateVectorType::const_iterator    end_;
+        unsigned long                               size_;
+
+}; // ShortReadSequence
+
 
 //////////////////////////////////////////////////////////////////////////////
 // NucleotideSequences

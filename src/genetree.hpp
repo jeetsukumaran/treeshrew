@@ -164,8 +164,8 @@ class GeneTree : public Tree<GeneNodeData> {
         void clear();
 
         int create_beagle_instance(int num_sites);
-        int set_tip_states(const GeneNodeData& tip, int * data);
-        int set_tip_partials(const GeneNodeData& tip, double * data);
+        int set_tip_states(const GeneNodeData& tip, const int * data);
+        int set_tip_partials(const GeneNodeData& tip, const double * data);
         double calc_ln_probability();
         void free_beagle_instance();
 
