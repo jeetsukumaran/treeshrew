@@ -24,13 +24,15 @@ nobase_dist_treeshrewtests_DATA = \
 	data/basic/pythonidae.tree.newick
 
 COMMON_TREE_SRC = \
-	../src/character.hpp \
-	../src/character.cpp \
 	../src/utility.hpp \
 	../src/utility.cpp \
+	../src/character.hpp \
+	../src/character.cpp \
 	../src/tree.hpp \
 	../src/genetree.hpp \
 	../src/genetree.cpp \
+	../src/statespace.hpp \
+	../src/statespace.cpp \
 	../src/dataio.hpp
 
 COMMON_TEST_SRC = \

@@ -150,9 +150,10 @@ void NucleotideSequences::set_tip_data(GeneTree * gene_tree) {
 
 NucleotideAlignment::NucleotideAlignment(unsigned long max_sequences,
         unsigned long max_sites)
-        :  max_sequences_(max_sequences)
-        ,  max_sites_(max_sites)
-        ,  max_active_sites_(0) {
+        : max_sequences_(max_sequences)
+        , max_sites_(max_sites)
+        , max_active_sites_(0)
+        , gene_tree_(nullptr) {
     this->create();
 }
 
@@ -184,7 +185,12 @@ void NucleotideAlignment::clear() {
     }
     this->sequence_storage_.clear();
     this->active_sequences_.clear();
-    this->label_sequence_map_.clear();
+    this->sequence_node_map_.clear();
+    this->gene_tree_ = nullptr;
+}
+
+void NucleotideAlignment::set_gene_tree(GeneTree * gene_tree) {
+    this->gene_tree_ = gene_tree;
 }
 
 } // namespace treeshrew

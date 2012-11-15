@@ -115,6 +115,44 @@ class NucleotideSequence {
 }; // NucleotideSequence
 
 //////////////////////////////////////////////////////////////////////////////
+// NucleotideSequences
+
+class NucleotideSequences {
+
+    public:
+        NucleotideSequences();
+        ~NucleotideSequences();
+        void clear();
+        inline NucleotideSequence * new_sequence(const std::string& label) {
+            NucleotideSequence * v = new NucleotideSequence(label);
+            this->sequences_.push_back(v);
+            this->label_sequence_map_[label] = v;
+            return v;
+        }
+        NucleotideSequence * get_sequence(unsigned long index) {
+            TREESHREW_ASSERT(index < this->sequences_.size());
+            return this->sequences_[index];
+        }
+        unsigned long get_num_sequences() {
+            return this->sequences_.size();
+        }
+        unsigned long get_num_sites() {
+            if (this->sequences_.size() > 0) {
+                return this->sequences_[0]->size();
+            } else {
+                return 0;
+            }
+        }
+        void set_tip_data(GeneTree * gene_tree);
+
+    protected:
+        std::vector<NucleotideSequence *>               sequences_;
+        std::map<std::string, NucleotideSequence *>     label_sequence_map_;
+
+
+}; // NucleotideSequences
+
+//////////////////////////////////////////////////////////////////////////////
 // ShortReadSequence
 
 class ShortReadSequence {
@@ -157,45 +195,6 @@ class ShortReadSequence {
 
 }; // ShortReadSequence
 
-
-//////////////////////////////////////////////////////////////////////////////
-// NucleotideSequences
-
-class NucleotideSequences {
-
-    public:
-        NucleotideSequences();
-        ~NucleotideSequences();
-        void clear();
-        inline NucleotideSequence * new_sequence(const std::string& label) {
-            NucleotideSequence * v = new NucleotideSequence(label);
-            this->sequences_.push_back(v);
-            this->label_sequence_map_[label] = v;
-            return v;
-        }
-        NucleotideSequence * get_sequence(unsigned long index) {
-            TREESHREW_ASSERT(index < this->sequences_.size());
-            return this->sequences_[index];
-        }
-        unsigned long get_num_sequences() {
-            return this->sequences_.size();
-        }
-        unsigned long get_num_sites() {
-            if (this->sequences_.size() > 0) {
-                return this->sequences_[0]->size();
-            } else {
-                return 0;
-            }
-        }
-        void set_tip_data(GeneTree * gene_tree);
-
-    protected:
-        std::vector<NucleotideSequence *>               sequences_;
-        std::map<std::string, NucleotideSequence *>     label_sequence_map_;
-
-
-}; // NucleotideSequences
-
 //////////////////////////////////////////////////////////////////////////////
 // NucleotideAlignment
 
@@ -207,15 +206,27 @@ class NucleotideAlignment {
         ~NucleotideAlignment();
         void create();
         void clear();
+        void set_alignment(const NucleotideSequences& sequences);
+        void set_gene_tree(GeneTree * gene_tree);
+        unsigned long get_max_sequences() const {
+            return this->max_sequences_;
+        }
+        unsigned long get_max_sites() const {
+            return this->max_sites_;
+        }
+        unsigned long get_max_active_sites() const {
+            return this->max_active_sites_;
+        }
 
     protected:
-        unsigned long                                   max_sequences_;
-        unsigned long                                   max_sites_;
-        unsigned long                                   max_active_sites_;
-        std::vector<NucleotideSequence *>               sequence_storage_;
-        std::stack<NucleotideSequence *>                available_sequences_;
-        std::vector<NucleotideSequence *>               active_sequences_;
-        std::map<std::string, NucleotideSequence *>     label_sequence_map_;
+        unsigned long                                           max_sequences_;
+        unsigned long                                           max_sites_;
+        unsigned long                                           max_active_sites_;
+        std::vector<NucleotideSequence *>                       sequence_storage_;
+        std::stack<NucleotideSequence *>                        available_sequences_;
+        std::vector<NucleotideSequence *>                       active_sequences_;
+        GeneTree *                                              gene_tree_;
+        std::map<NucleotideSequence *, GeneTree::node_type *>   sequence_node_map_;
 
 }; // NucleotideAlignment
 
