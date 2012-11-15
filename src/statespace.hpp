@@ -21,6 +21,9 @@ class StateSpace {
         void dispose_gene_tree();
         void dispose_alignment();
         void write_phylogenetic_data(std::ostream&);
+        inline GeneTree * get_gene_tree() {
+            return this->gene_tree_;
+        }
 
     private:
         NucleotideAlignment                 alignment_;

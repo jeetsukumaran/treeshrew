@@ -35,6 +35,7 @@ void StateSpace::initialize_with_tree_and_alignment(
     } else {
         this->gene_tree_ = trees[0];
     }
+    this->gene_tree_->create_beagle_instance(this->alignment_.get_max_sites());
 
     // alignment
     NucleotideSequences dna;
@@ -43,6 +44,8 @@ void StateSpace::initialize_with_tree_and_alignment(
     for (auto leaf_iter = this->gene_tree_->leaf_begin(); leaf_iter != this->gene_tree_->leaf_end(); ++leaf_iter) {
         NucleotideSequence * dseq = dna.get_sequence(leaf_iter->get_label());
         this->alignment_.new_sequence(&(*leaf_iter), dseq);
+        this->gene_tree_->set_tip_partials(*leaf_iter,
+                this->alignment_.get_partials_data(&(*leaf_iter)));
     }
 }
 

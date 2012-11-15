@@ -280,6 +280,9 @@ class NucleotideAlignment {
                 this->set_sequence_states(seq, src_seq);
             }
         }
+        inline const double * get_partials_data(GeneNodeData * gene_node_data) const {
+            return this->node_data_sequence_map_.find(gene_node_data)->second->partials_data();
+        }
         void write_states_as_symbols(GeneNodeData * gene_node_data, std::ostream& out) const;
 
     protected:
