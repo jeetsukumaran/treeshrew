@@ -50,11 +50,29 @@ class NucleotideSequence {
         inline unsigned long size() {
             return this->sequence_.size();
         }
-        inline const CharacterStateVectorType::const_iterator begin() const {
+        inline CharacterStateVectorType::iterator begin() {
             return this->sequence_.begin();
         }
-        inline const CharacterStateVectorType::const_iterator end() const {
+        inline CharacterStateVectorType::iterator end() {
             return this->sequence_.end();
+        }
+        inline const CharacterStateVectorType::const_iterator cbegin() const {
+            return this->sequence_.cbegin();
+        }
+        inline const CharacterStateVectorType::const_iterator cend() const {
+            return this->sequence_.cend();
+        }
+        inline std::vector<double>::iterator partials_begin() {
+            return this->partials_.begin();
+        }
+        inline std::vector<double>::iterator partials_end() {
+            return this->partials_.end();
+        }
+        inline const std::vector<double>::const_iterator partials_cbegin() const {
+            return this->partials_.cbegin();
+        }
+        inline const std::vector<double>::const_iterator partials_cend() const {
+            return this->partials_.cend();
         }
         inline void append_state(CharacterStateType c) {
             this->sequence_.push_back(c);
@@ -123,6 +141,18 @@ class NucleotideSequences {
         NucleotideSequences();
         ~NucleotideSequences();
         void clear();
+        inline std::vector<NucleotideSequence *>::iterator begin() {
+            return this->sequences_.begin();
+        }
+        inline std::vector<NucleotideSequence *>::iterator end() {
+            return this->sequences_.end();
+        }
+        inline const std::vector<NucleotideSequence *>::const_iterator cbegin() const {
+            return this->sequences_.cbegin();
+        }
+        inline const std::vector<NucleotideSequence *>::const_iterator cend() const {
+            return this->sequences_.cend();
+        }
         inline NucleotideSequence * new_sequence(const std::string& label) {
             NucleotideSequence * v = new NucleotideSequence(label);
             this->sequences_.push_back(v);
@@ -160,7 +190,7 @@ class ShortReadSequence {
     public:
         ShortReadSequence(const NucleotideSequence& seq)
             : label_(seq.get_label())
-            , sequence_(seq.begin(), seq.end()) {
+            , sequence_(seq.cbegin(), seq.cend()) {
             this->begin_ = this->sequence_.begin();
             this->end_ = this->sequence_.end();
             this->size_ = this->sequence_.size();

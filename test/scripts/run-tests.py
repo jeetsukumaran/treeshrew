@@ -133,6 +133,28 @@ class TestRunner(object):
     FAIL = 1
     ERROR = 2
 
+    dna_to_partials =  {
+        'A' : [1.0, 0.0, 0.0, 0.0],
+        'C' : [0.0, 1.0, 0.0, 0.0],
+        'G' : [0.0, 0.0, 1.0, 0.0],
+        'T' : [0.0, 0.0, 0.0, 1.0],
+        'U' : [0.0, 0.0, 0.0, 1.0],
+        'N' : [1.0, 1.0, 1.0, 1.0],
+        'X' : [1.0, 1.0, 1.0, 1.0],
+        '-' : [1.0, 1.0, 1.0, 1.0],
+        '?' : [1.0, 1.0, 1.0, 1.0],
+        'R' : [1.0, 0.0, 1.0, 0.0],
+        'Y' : [0.0, 1.0, 0.0, 1.0],
+        'M' : [1.0, 1.0, 0.0, 0.0],
+        'W' : [1.0, 0.0, 0.0, 1.0],
+        'S' : [0.0, 1.0, 1.0, 0.0],
+        'K' : [0.0, 0.0, 1.0, 1.0],
+        'V' : [1.0, 1.0, 1.0, 0.0],
+        'H' : [1.0, 1.0, 0.0, 1.0],
+        'D' : [1.0, 0.0, 1.0, 1.0],
+        'B' : [0.0, 1.0, 1.0, 1.0]
+    }
+
     @staticmethod
     def get_node_tag(nd):
         if nd.taxon:
@@ -352,6 +374,45 @@ class TestRunner(object):
         test_tree = dendropy.Tree.get_from_string(self.test_stdout, "newick", taxon_set=taxa)
         # return self.compare_tree_traversal(check_tree, test_tree, "postorder_node_iter")
         return self.compare_trees(check_tree, test_tree)
+
+    def test_read_dna_sequences(self):
+        datafile = os.path.join(self.data_dir, "basic", "pythonidae.chars.fasta")
+        self.execute_test("read_dna_sequences",
+                [datafile, "fasta"])
+        if self.test_retcode != 0:
+            return TestRunner.ERROR
+        dna_matrix = dendropy.DnaCharacterMatrix.get_from_path(datafile, "fasta", row_type="STR")
+        expected_partials = {}
+        for taxon in dna_matrix:
+            label = taxon.label.replace(" ", "_")
+            expected_partials[label] = []
+            states = dna_matrix[taxon]
+            for state in states:
+                sub_partials = self.dna_to_partials[state]
+                expected_partials[label].extend(list(sub_partials))
+        rows = self.test_stdout.split("\n")
+        observed_partials = {}
+        for row in rows:
+            if not row:
+                continue
+            label, partials = row.split(":")
+            partials = [float(v) for v in partials.split(";") if v]
+            observed_partials[label] = list(partials)
+        for label in expected_partials:
+            if label not in observed_partials:
+                return self.fail("Sequence '{}' not found: {}".format(label,
+                    ",".join(["'{}'".format(t) for t in observed_partials])))
+            p1 = expected_partials[label]
+            p2 = observed_partials[label]
+            if len(p1) != len(p2):
+                return self.fail("Sequence '{}': expected {} elements but found {}".format(label,
+                    len(p1), len(p2)))
+            for idx, i1 in enumerate(p1):
+                i2 = p2[idx]
+                if not self.is_almost_equal(i1, i2):
+                    return self.fail("Sequence '{}': character {}: expected {} but found {}".format(label,
+                        idx, i1, i2))
+        return TestRunner.PASS
 
     def run(self):
         tests_to_run = []
