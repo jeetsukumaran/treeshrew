@@ -48,7 +48,7 @@ treeshrewtests_PROGRAMS = \
 	tree_leaf_iter \
 	tree_internal_iter \
 	tree_child_iter \
-	read_dna_alignment \
+	read_dna_sequences \
 	score_phylogenetic_tree \
 	benchmark_phylogenetic_tree \
 	calc_hamming_distance
@@ -89,10 +89,10 @@ tree_child_iter_SOURCES = \
 	$(COMMON_TEST_SRC) \
 	src/tree_child_iter.cpp
 
-read_dna_alignment_SOURCES = \
+read_dna_sequences_SOURCES = \
 	$(COMMON_TREE_SRC) \
 	$(COMMON_TEST_SRC) \
-	src/read_dna_alignment.cpp
+	src/read_dna_sequences.cpp
 
 score_phylogenetic_tree_SOURCES = \
 	$(COMMON_TREE_SRC) \
