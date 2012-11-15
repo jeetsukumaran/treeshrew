@@ -208,25 +208,38 @@ class NucleotideAlignment {
         void clear();
         void set_alignment(const NucleotideSequences& sequences);
         void set_gene_tree(GeneTree * gene_tree);
-        unsigned long get_max_sequences() const {
+        inline unsigned long get_max_sequences() const {
             return this->max_sequences_;
         }
-        unsigned long get_max_sites() const {
+        inline unsigned long get_max_sites() const {
             return this->max_sites_;
         }
-        unsigned long get_max_active_sites() const {
-            return this->max_active_sites_;
+        inline unsigned long get_num_active_sites() const {
+            return this->num_active_sites_;
+        }
+        inline void set_num_active_sites(unsigned long num) {
+            this->num_active_sites_ = num;
+        }
+        inline NucleotideSequence * new_sequence(GeneNodeData& gene_node_data) {
+            if (this->available_sequences_.size() == 0) {
+                treeshrew_abort("Maximum number of sequences exceeded");
+            }
+            NucleotideSequence * seq = this->available_sequences_.top();
+            this->available_sequences_.pop();
+            this->sequence_node_data_map_[seq] = &gene_node_data;
+            this->node_data_sequence_map_[&gene_node_data] = seq;
+            return seq;
         }
 
     protected:
         unsigned long                                           max_sequences_;
         unsigned long                                           max_sites_;
-        unsigned long                                           max_active_sites_;
+        unsigned long                                           num_active_sites_;
         std::vector<NucleotideSequence *>                       sequence_storage_;
         std::stack<NucleotideSequence *>                        available_sequences_;
-        std::vector<NucleotideSequence *>                       active_sequences_;
         GeneTree *                                              gene_tree_;
-        std::map<NucleotideSequence *, GeneTree::node_type *>   sequence_node_map_;
+        std::map<NucleotideSequence *, GeneNodeData *>          sequence_node_data_map_;
+        std::map<GeneNodeData *, NucleotideSequence *>          node_data_sequence_map_;
 
 }; // NucleotideAlignment
 

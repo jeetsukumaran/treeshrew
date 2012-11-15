@@ -10,14 +10,8 @@ StateSpace::StateSpace(unsigned long max_sequences,
 }
 
 StateSpace::~StateSpace() {
-}
-
-void StateSpace::dispose_gene_tree() {
-    if (this->gene_tree_) {
-        this->gene_tree_->clear();
-        delete this->gene_tree_;
-        this->gene_tree_ = nullptr;
-    }
+    this->dispose_gene_tree();
+    this->dispose_alignment();
 }
 
 void StateSpace::set_gene_tree(std::istream& src, const std::string& format) {
@@ -40,6 +34,28 @@ void StateSpace::set_gene_tree(GeneTree * gene_tree) {
     this->dispose_gene_tree();
     this->gene_tree_ = gene_tree;
     this->alignment_.set_gene_tree(this->gene_tree_);
+}
+
+void StateSpace::dispose_gene_tree() {
+    if (this->gene_tree_) {
+        this->gene_tree_->clear();
+        delete this->gene_tree_;
+        this->gene_tree_ = nullptr;
+    }
+}
+
+void StateSpace::set_alignment(std::istream& src, const std::string& format) {
+    this->dispose_alignment();
+    NucleotideSequences dna;
+    sequenceio::read_from_stream(dna, src, format);
+    this->alignment_.set_num_active_sites(dna.get_num_sites());
+    for (auto leaf_iter = this->gene_tree_->leaf_begin(); leaf_iter != this->gene_tree_->leaf_end(); ++leaf_iter) {
+        NucleotideSequence * seq = this->alignment_.new_sequence(*leaf_iter);
+    }
+}
+
+void StateSpace::dispose_alignment() {
+    this->alignment_.clear();
 }
 
 } // treeshrew
