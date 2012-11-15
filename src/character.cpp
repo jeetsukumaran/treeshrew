@@ -31,7 +31,7 @@ unsigned long sliding_hamming_distance(const CharacterStateVectorType& short_rea
 //////////////////////////////////////////////////////////////////////////////
 // NucleotideSequence
 
-std::map<char, CharacterStateType> NucleotideSequence::symbol_to_state_map_ {
+const std::map<char, CharacterStateType> NucleotideSequence::symbol_to_state_map_ {
     {'A', 0},
     {'C', 1},
     {'G', 2},
@@ -53,7 +53,7 @@ std::map<char, CharacterStateType> NucleotideSequence::symbol_to_state_map_ {
     {'B', 14}
 };
 
-std::map<CharacterStateType, char> NucleotideSequence::state_to_symbol_map_ {
+const std::map<CharacterStateType, char> NucleotideSequence::state_to_symbol_map_ {
     { 0, 'A'},
     { 1, 'C'},
     { 2, 'G'},
@@ -74,7 +74,7 @@ std::map<CharacterStateType, char> NucleotideSequence::state_to_symbol_map_ {
     {11, 'V'}
 };
 
-std::map<CharacterStateType, std::array<double, 4>> NucleotideSequence::state_to_partials_map_ {
+const std::map<CharacterStateType, std::array<double, 4>> NucleotideSequence::state_to_partials_map_ {
     { 0, {{1.0, 0.0, 0.0, 0.0}}},   // A
     { 1, {{0.0, 1.0, 0.0, 0.0}}},   // C
     { 2, {{0.0, 0.0, 1.0, 0.0}}},   // G
@@ -92,6 +92,9 @@ std::map<CharacterStateType, std::array<double, 4>> NucleotideSequence::state_to
     {14, {{0.0, 1.0, 1.0, 1.0}}}    // B
 };
 
+const CharacterStateType NucleotideSequence::missing_data_state(NucleotideSequence::symbol_to_state_map_.find('?')->second);
+const std::array<double, 4> NucleotideSequence::missing_data_partials = NucleotideSequence::state_to_partials_map_.find(NucleotideSequence::missing_data_state)->second;
+
 NucleotideSequence::NucleotideSequence() {
 }
 
@@ -104,7 +107,7 @@ NucleotideSequence::~NucleotideSequence() {
 
 void NucleotideSequence::write_states_as_symbols(std::ostream& out) const {
     for (auto & s : this->sequence_) {
-        out << this->state_to_symbol_map_[s];
+        out << this->state_to_symbol_map_.find(s)->second;
     }
 }
 std::string NucleotideSequence::get_states_as_symbols() const {
@@ -161,12 +164,11 @@ NucleotideAlignment::~NucleotideAlignment() {
 }
 
 void NucleotideAlignment::create() {
-    auto uncertain_state = NucleotideSequence::get_state_from_symbol('?');
     this->sequence_storage_.reserve(this->max_sequences_);
     for (unsigned long row = 0; row < this->max_sequences_; ++row) {
         NucleotideSequence * s = new NucleotideSequence();
         for (unsigned long col = 0; col < this->max_sites_; ++col) {
-            s->append_state(uncertain_state);
+            s->append_state(NucleotideSequence::missing_data_state);
         }
         this->sequence_storage_.push_back(s);
         this->available_sequences_.push(s);

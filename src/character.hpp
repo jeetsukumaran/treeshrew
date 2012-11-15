@@ -48,7 +48,7 @@ class NucleotideSequence {
         void reserve(unsigned long size) {
             this->sequence_.reserve(size);
         }
-        inline unsigned long size() {
+        inline unsigned long size() const {
             return this->sequence_.size();
         }
         inline CharacterStateVectorType::iterator begin() {
@@ -81,7 +81,7 @@ class NucleotideSequence {
         inline void append_state_by_symbol(char s) {
             auto state = NucleotideSequence::get_state_from_symbol(s);
             this->sequence_.push_back(state);
-            auto state_partials = this->state_to_partials_map_[state];
+            auto state_partials = this->state_to_partials_map_.find(state)->second;
             this->partials_.insert(this->partials_.end(), state_partials.begin(), state_partials.end());
         }
         inline void append_states_by_symbols(const std::string& s) {
@@ -111,10 +111,12 @@ class NucleotideSequence {
         CharacterStateVectorType    sequence_;
         std::vector<double>         partials_;
 
-    protected:
-        static std::map<char, CharacterStateType>                     symbol_to_state_map_;
-        static std::map<CharacterStateType, char>                     state_to_symbol_map_;
-        static std::map<CharacterStateType, std::array<double, 4>>    state_to_partials_map_;
+    public:
+        static const std::map<char, CharacterStateType>                     symbol_to_state_map_;
+        static const std::map<CharacterStateType, char>                     state_to_symbol_map_;
+        static const std::map<CharacterStateType, std::array<double, 4>>    state_to_partials_map_;
+        static const CharacterStateType                                     missing_data_state;
+        static const std::array<double, 4>                                  missing_data_partials;
 
     public:
         inline static const CharacterStateType get_state_from_symbol(char s) {
@@ -259,7 +261,7 @@ class NucleotideAlignment {
         inline void set_num_active_sites(unsigned long num) {
             this->num_active_sites_ = num;
         }
-        inline NucleotideSequence * new_sequence(
+        inline void new_sequence(
                 GeneNodeData * gene_node_data,
                 const NucleotideSequence * src_seq=nullptr) {
             TREESHREW_NDEBUG_ASSERT(gene_node_data);
@@ -272,9 +274,20 @@ class NucleotideAlignment {
             this->node_data_sequence_map_[gene_node_data] = seq;
             seq->set_label(gene_node_data->get_label());
             if (src_seq) {
-                std::copy(src_seq->cbegin(), src_seq->cend(), seq->begin());
+                this->set_sequence_states(seq, src_seq);
             }
-            return seq;
+        }
+
+    protected:
+        void set_sequence_states(NucleotideSequence * seq, const NucleotideSequence * src_seq) {
+            unsigned long len = src_seq->size();
+            if (len > this->num_active_sites_) {
+                this->num_active_sites_ = len;
+            }
+            std::copy(src_seq->cbegin(), src_seq->cend(), seq->begin());
+            std::fill(seq->begin() + len, seq->end(), NucleotideSequence::missing_data_state);
+            std::copy(src_seq->partials_cbegin(), src_seq->partials_cend(), seq->partials_begin());
+            std::fill(seq->partials_begin() + len, seq->partials_end(), 1.0);
         }
 
     protected:
