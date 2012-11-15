@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <iterator>
 #include "character.hpp"
 
 namespace treeshrew {
@@ -187,6 +189,17 @@ void NucleotideAlignment::clear() {
     this->sequence_storage_.clear();
     this->sequence_node_data_map_.clear();
     this->node_data_sequence_map_.clear();
+}
+
+void NucleotideAlignment::write_states_as_symbols(
+        GeneNodeData * gene_node_data,
+        std::ostream& out) const {
+    auto si = this->node_data_sequence_map_.find(gene_node_data);
+    TREESHREW_NDEBUG_ASSERT(si != this->node_data_sequence_map_.end());
+    NucleotideSequence * seq = si->second;
+    std::copy(seq->cbegin(),
+            seq->cbegin() + this->num_active_sites_,
+            std::ostream_iterator<double>(out, ""));
 }
 
 } // namespace treeshrew

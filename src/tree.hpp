@@ -441,7 +441,7 @@ class Tree {
 
         // -- postorder iterator --
 
-        postorder_iterator postorder_begin() {
+        postorder_iterator postorder_begin() const {
             node_type * nd = this->head_node_;
             while (nd->first_child_node() != nullptr) {
                 nd = nd->first_child_node();
@@ -449,17 +449,17 @@ class Tree {
             return postorder_iterator(nd);
         }
 
-        postorder_iterator postorder_end() {
+        postorder_iterator postorder_end() const {
             return postorder_iterator(this->head_node_->next_sibling_node());
         }
 
         // -- leaf iterator --
 
-        leaf_iterator leaf_begin() {
+        leaf_iterator leaf_begin() const {
             return this->leaf_begin(this->head_node_);
         }
 
-        leaf_iterator leaf_begin(node_type * nd) {
+        leaf_iterator leaf_begin(node_type * nd) const {
             node_type * first = nd;
             while (first->first_child_node() != nullptr) {
                 first = first->first_child_node();
@@ -468,50 +468,61 @@ class Tree {
         }
 
         template <typename iter>
-        leaf_iterator leaf_begin(iter& pos) {
+        leaf_iterator leaf_begin(iter& pos) const {
             return leaf_begin(pos.node());
         }
 
-        leaf_iterator leaf_end() {
+        leaf_iterator leaf_end() const {
             return this->leaf_end(this->head_node_);
         }
 
-        leaf_iterator leaf_end(node_type * nd) {
+        leaf_iterator leaf_end(node_type * nd) const {
             return leaf_iterator(nd);
         }
 
         template <typename iter>
-        leaf_iterator leaf_end(iter& pos) {
+        leaf_iterator leaf_end(iter& pos) const {
             return leaf_iterator(pos->node());
         }
 
         // -- children iterator --
 
-        child_iterator children_begin() {
+        child_iterator children_begin() const {
             return child_iterator(this->head_node_->first_child_node());
         }
 
-        child_iterator children_begin(node_type * nd) {
+        child_iterator children_begin(node_type * nd) const {
             return child_iterator(nd->first_child_node());
         }
 
         template <typename iter>
-        child_iterator children_begin(iter& pos) {
+        child_iterator children_begin(iter& pos) const {
             return child_iterator(pos.node()->first_child_node());
         }
 
-        child_iterator children_end() {
+        child_iterator children_end() const {
             return child_iterator(nullptr);
         }
 
-        child_iterator children_end(node_type * nd) {
+        child_iterator children_end(node_type * nd) const {
             return child_iterator(nullptr);
         }
 
         template <typename iter>
-        child_iterator children_end(iter& pos) {
+        child_iterator children_end(iter& pos) const {
             return child_iterator(nullptr);
         }
+
+        /////////////////////////////////////////////////////////////////////////
+        // Metrics
+
+        inline unsigned long get_num_leaves() const {
+            unsigned long leaf_count = 0;
+            for (auto ndi = this->leaf_begin(); ndi != this->leaf_end(); ++ndi, ++leaf_count) {
+            }
+            return leaf_count;
+        }
+
 
         /////////////////////////////////////////////////////////////////////////
         // Structure Access

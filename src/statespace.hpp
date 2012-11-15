@@ -1,6 +1,7 @@
 #ifndef TREESHREW_STATESPACE_HPP
 #define TREESHREW_STATESPACE_HPP
 
+#include <iostream>
 #include "character.hpp"
 #include "genetree.hpp"
 
@@ -19,6 +20,7 @@ class StateSpace {
                 );
         void dispose_gene_tree();
         void dispose_alignment();
+        void write_phylogenetic_data(std::ostream&);
 
     private:
         NucleotideAlignment                 alignment_;

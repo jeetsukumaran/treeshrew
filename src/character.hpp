@@ -168,19 +168,19 @@ class NucleotideSequences {
             this->label_sequence_map_[label] = v;
             return v;
         }
-        NucleotideSequence * get_sequence(unsigned long index) const {
+        inline NucleotideSequence * get_sequence(unsigned long index) const {
             TREESHREW_ASSERT(index < this->sequences_.size());
             return this->sequences_[index];
         }
-        NucleotideSequence * get_sequence(const std::string& label) const {
+        inline NucleotideSequence * get_sequence(const std::string& label) const {
             auto label_sequence = this->label_sequence_map_.find(label);
             TREESHREW_ASSERT(label_sequence != this->label_sequence_map_.end());
             return label_sequence->second;
         }
-        unsigned long get_num_sequences() {
+        inline unsigned long get_num_sequences() {
             return this->sequences_.size();
         }
-        unsigned long get_num_sites() {
+        inline unsigned long get_num_sites() {
             if (this->sequences_.size() > 0) {
                 return this->sequences_[0]->size();
             } else {
@@ -280,6 +280,7 @@ class NucleotideAlignment {
                 this->set_sequence_states(seq, src_seq);
             }
         }
+        void write_states_as_symbols(GeneNodeData * gene_node_data, std::ostream& out) const;
 
     protected:
         void set_sequence_states(NucleotideSequence * seq, const NucleotideSequence * src_seq) {

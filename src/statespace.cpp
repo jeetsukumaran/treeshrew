@@ -58,4 +58,25 @@ void StateSpace::dispose_alignment() {
     this->alignment_.clear();
 }
 
+void StateSpace::write_phylogenetic_data(std::ostream& out) {
+    out << "#NEXUS\n\n";
+
+    // make sure branch lengths are stored when tree is read
+    out << "begin Paup;\n    set storebr;\n    set warnreset = no warnroot = no;\nend;\n\n" << std::endl;
+
+    out << "begin data;\n";
+    out << "    dimensions ntax=" << this->gene_tree_->get_num_leaves() << " nchar=" << this->alignment_.get_num_active_sites() << ";\n";
+    out << "    format datatype=dna gap=- missing=? matchchar=.;\n";
+    out << "    matrix\n";
+    for (auto ndi = this->gene_tree_->leaf_begin(); ndi != this->gene_tree_->leaf_end(); ++ndi) {
+        out << "    " << ndi->get_label() << "        ";
+        this->alignment_.write_states_as_symbols(&(*ndi), out);
+        out << "\n";
+    }
+    out << "end;\n";
+
+    // calculate the likelihood
+    out << "begin paup;\n    set crit=likelihood;\n    lset userbr nst=1 rmatrix=estimate basefreq=equal rates=equal pinvar=0;\n    lscore;\nend;\n";
+}
+
 } // treeshrew
