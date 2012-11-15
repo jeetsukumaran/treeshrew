@@ -2,6 +2,7 @@
 #define TREESHREW_CHARACTER_HPP
 
 #include <array>
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -98,6 +99,9 @@ class NucleotideSequence {
         inline const std::string& get_label() const {
             return this->label_;
         }
+        inline void set_label(const std::string& label) {
+            this->label_ = label;
+        }
 
         void write_states_as_symbols(std::ostream& out) const;
         std::string get_states_as_symbols() const;
@@ -159,9 +163,14 @@ class NucleotideSequences {
             this->label_sequence_map_[label] = v;
             return v;
         }
-        NucleotideSequence * get_sequence(unsigned long index) {
+        NucleotideSequence * get_sequence(unsigned long index) const {
             TREESHREW_ASSERT(index < this->sequences_.size());
             return this->sequences_[index];
+        }
+        NucleotideSequence * get_sequence(const std::string& label) const {
+            auto label_sequence = this->label_sequence_map_.find(label);
+            TREESHREW_ASSERT(label_sequence != this->label_sequence_map_.end());
+            return label_sequence->second;
         }
         unsigned long get_num_sequences() {
             return this->sequences_.size();
@@ -250,14 +259,21 @@ class NucleotideAlignment {
         inline void set_num_active_sites(unsigned long num) {
             this->num_active_sites_ = num;
         }
-        inline NucleotideSequence * new_sequence(GeneNodeData& gene_node_data) {
+        inline NucleotideSequence * new_sequence(
+                GeneNodeData * gene_node_data,
+                const NucleotideSequence * src_seq=nullptr) {
+            TREESHREW_NDEBUG_ASSERT(gene_node_data);
             if (this->available_sequences_.size() == 0) {
                 treeshrew_abort("Maximum number of sequences exceeded");
             }
             NucleotideSequence * seq = this->available_sequences_.top();
             this->available_sequences_.pop();
-            this->sequence_node_data_map_[seq] = &gene_node_data;
-            this->node_data_sequence_map_[&gene_node_data] = seq;
+            this->sequence_node_data_map_[seq] = gene_node_data;
+            this->node_data_sequence_map_[gene_node_data] = seq;
+            seq->set_label(gene_node_data->get_label());
+            if (src_seq) {
+                std::copy(src_seq->cbegin(), src_seq->cend(), seq->begin());
+            }
             return seq;
         }
 
@@ -267,7 +283,6 @@ class NucleotideAlignment {
         unsigned long                                           num_active_sites_;
         std::vector<NucleotideSequence *>                       sequence_storage_;
         std::stack<NucleotideSequence *>                        available_sequences_;
-        GeneTree *                                              gene_tree_;
         std::map<NucleotideSequence *, GeneNodeData *>          sequence_node_data_map_;
         std::map<GeneNodeData *, NucleotideSequence *>          node_data_sequence_map_;
 

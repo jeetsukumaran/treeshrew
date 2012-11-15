@@ -152,8 +152,7 @@ NucleotideAlignment::NucleotideAlignment(unsigned long max_sequences,
         unsigned long max_sites)
         : max_sequences_(max_sequences)
         , max_sites_(max_sites)
-        , num_active_sites_(0)
-        , gene_tree_(nullptr) {
+        , num_active_sites_(0) {
     this->create();
 }
 
@@ -186,11 +185,6 @@ void NucleotideAlignment::clear() {
     this->sequence_storage_.clear();
     this->sequence_node_data_map_.clear();
     this->node_data_sequence_map_.clear();
-    this->gene_tree_ = nullptr;
-}
-
-void NucleotideAlignment::set_gene_tree(GeneTree * gene_tree) {
-    this->gene_tree_ = gene_tree;
 }
 
 } // namespace treeshrew
