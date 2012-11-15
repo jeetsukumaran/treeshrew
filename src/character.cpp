@@ -102,6 +102,17 @@ NucleotideSequence::NucleotideSequence(const std::string& label) :
 NucleotideSequence::~NucleotideSequence() {
 }
 
+void NucleotideSequence::write_states_as_symbols(std::ostream& out) const {
+    for (auto & s : this->sequence_) {
+        out << this->state_to_symbol_map_[s];
+    }
+}
+std::string NucleotideSequence::get_states_as_symbols() const {
+    std::ostringstream out;
+    this->write_states_as_symbols(out);
+    return out.str();
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // NucleotideSequences
 
@@ -132,6 +143,48 @@ void NucleotideSequences::set_tip_data(GeneTree * gene_tree) {
         }
         gene_tree->set_tip_partials(*leaf_iter, seq->partials_data());
     }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// NucleotideAlignment
+
+NucleotideAlignment::NucleotideAlignment(unsigned long max_sequences,
+        unsigned long max_sites)
+        :  max_sequences_(max_sequences)
+        ,  max_sites_(max_sites)
+        ,  max_active_sites_(0) {
+    this->create();
+}
+
+NucleotideAlignment::~NucleotideAlignment() {
+    this->clear();
+}
+
+void NucleotideAlignment::create() {
+    auto uncertain_state = NucleotideSequence::get_state_from_symbol('?');
+    this->sequence_storage_.reserve(this->max_sequences_);
+    for (unsigned long row = 0; row < this->max_sequences_; ++row) {
+        NucleotideSequence * s = new NucleotideSequence();
+        for (unsigned long col = 0; col < this->max_sites_; ++col) {
+            s->append_state(uncertain_state);
+        }
+        this->sequence_storage_.push_back(s);
+        this->available_sequences_.push(s);
+    }
+}
+
+void NucleotideAlignment::clear() {
+    for (auto & v : this->sequence_storage_) {
+        if (v) {
+            delete v;
+        }
+    }
+    while (this->available_sequences_.size() > 0) {
+        this->available_sequences_.pop();
+    }
+    this->sequence_storage_.clear();
+    this->active_sequences_.clear();
+    this->label_sequence_map_.clear();
 }
 
 } // namespace treeshrew

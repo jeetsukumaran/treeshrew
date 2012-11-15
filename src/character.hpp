@@ -47,49 +47,42 @@ class NucleotideSequence {
         void reserve(unsigned long size) {
             this->sequence_.reserve(size);
         }
-        unsigned long size() {
+        inline unsigned long size() {
             return this->sequence_.size();
         }
-        const CharacterStateVectorType::const_iterator begin() const {
+        inline const CharacterStateVectorType::const_iterator begin() const {
             return this->sequence_.begin();
         }
-        const CharacterStateVectorType::const_iterator end() const {
+        inline const CharacterStateVectorType::const_iterator end() const {
             return this->sequence_.end();
         }
-        void append_state(CharacterStateType c) {
+        inline void append_state(CharacterStateType c) {
             this->sequence_.push_back(c);
         }
-        void append_state_by_symbol(char s) {
+        inline void append_state_by_symbol(char s) {
             auto state = NucleotideSequence::get_state_from_symbol(s);
             this->sequence_.push_back(state);
             auto state_partials = this->state_to_partials_map_[state];
             this->partials_.insert(this->partials_.end(), state_partials.begin(), state_partials.end());
         }
-        void append_states_by_symbols(const std::string& s) {
+        inline void append_states_by_symbols(const std::string& s) {
             this->sequence_.reserve(this->sequence_.size() + s.size());
             for (auto & c : s) {
                 this->append_state_by_symbol(c);
             }
         }
-        const CharacterStateType * state_data() const {
+        inline const CharacterStateType * state_data() const {
             return this->sequence_.data();
         }
-        const double * partials_data() const {
+        inline const double * partials_data() const {
             return this->partials_.data();
         }
-        const std::string& get_label() const {
+        inline const std::string& get_label() const {
             return this->label_;
         }
-        void write_states_as_symbols(std::ostream& out) const {
-            for (auto & s : this->sequence_) {
-                out << this->state_to_symbol_map_[s];
-            }
-        }
-        std::string get_states_as_symbols() const {
-            std::ostringstream out;
-            this->write_states_as_symbols(out);
-            return out.str();
-        }
+
+        void write_states_as_symbols(std::ostream& out) const;
+        std::string get_states_as_symbols() const;
 
     protected:
         std::string                 label_;
@@ -128,7 +121,8 @@ class ShortReadSequence {
 
     public:
         ShortReadSequence(const NucleotideSequence& seq)
-            : sequence_(seq.begin(), seq.end()) {
+            : label_(seq.get_label())
+            , sequence_(seq.begin(), seq.end()) {
             this->begin_ = this->sequence_.begin();
             this->end_ = this->sequence_.end();
             this->size_ = this->sequence_.size();
@@ -155,6 +149,7 @@ class ShortReadSequence {
         }
 
     private:
+        std::string                                 label_;
         CharacterStateVectorType                    sequence_;
         CharacterStateVectorType::const_iterator    begin_;
         CharacterStateVectorType::const_iterator    end_;
@@ -200,6 +195,29 @@ class NucleotideSequences {
 
 
 }; // NucleotideSequences
+
+//////////////////////////////////////////////////////////////////////////////
+// NucleotideAlignment
+
+class NucleotideAlignment {
+
+    public:
+        NucleotideAlignment(unsigned long max_sequences,
+                unsigned long max_sites);
+        ~NucleotideAlignment();
+        void create();
+        void clear();
+
+    protected:
+        unsigned long                                   max_sequences_;
+        unsigned long                                   max_sites_;
+        unsigned long                                   max_active_sites_;
+        std::vector<NucleotideSequence *>               sequence_storage_;
+        std::stack<NucleotideSequence *>                available_sequences_;
+        std::vector<NucleotideSequence *>               active_sequences_;
+        std::map<std::string, NucleotideSequence *>     label_sequence_map_;
+
+}; // NucleotideAlignment
 
 
 } // namespace treeshrew
