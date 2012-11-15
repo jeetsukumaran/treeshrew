@@ -11,13 +11,13 @@ class StateSpace {
     public:
         StateSpace(unsigned long max_sequences, unsigned long max_sites);
         ~StateSpace();
-        void set_gene_tree(std::istream& src, const std::string& format="newick");
-        void set_gene_tree(GeneTree * gene_tree);
-        inline GeneTree * get_gene_tree() const {
-            return this->gene_tree_;
-        }
+        void initialize_with_tree_and_alignment(
+                std::istream& tree_src,
+                std::istream& alignment_src,
+                const std::string& tree_format="newick",
+                const std::string& alignment_format="fasta"
+                );
         void dispose_gene_tree();
-        void set_alignment(std::istream& src, const std::string& format="fasta");
         void dispose_alignment();
 
     private:
