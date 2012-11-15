@@ -51,6 +51,9 @@ class NucleotideSequence {
         inline unsigned long size() const {
             return this->sequence_.size();
         }
+        inline unsigned long partials_size() const {
+            return this->partials_.size();
+        }
         inline CharacterStateVectorType::iterator begin() {
             return this->sequence_.begin();
         }
@@ -287,7 +290,7 @@ class NucleotideAlignment {
             std::copy(src_seq->cbegin(), src_seq->cend(), seq->begin());
             std::fill(seq->begin() + len, seq->end(), NucleotideSequence::missing_data_state);
             std::copy(src_seq->partials_cbegin(), src_seq->partials_cend(), seq->partials_begin());
-            std::fill(seq->partials_begin() + len, seq->partials_end(), 1.0);
+            std::fill(seq->partials_begin() + src_seq->partials_size(), seq->partials_end(), 1.0);
         }
 
     protected:
