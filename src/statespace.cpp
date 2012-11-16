@@ -67,6 +67,7 @@ void StateSpace::write_phylogenetic_data(std::ostream& out) {
     // make sure branch lengths are stored when tree is read
     out << "begin Paup;\n    set storebr;\n    set warnreset = no warnroot = no;\nend;\n\n" << std::endl;
 
+    // character matrix
     out << "begin data;\n";
     out << "    dimensions ntax=" << this->gene_tree_->get_num_leaves() << " nchar=" << this->alignment_.get_num_active_sites() << ";\n";
     out << "    format datatype=dna gap=- missing=? matchchar=.;\n";
@@ -77,6 +78,12 @@ void StateSpace::write_phylogenetic_data(std::ostream& out) {
         out << "\n";
     }
     out << "    ;\nend;\n";
+
+    // tree
+    out << "begin trees;\n";
+    out << "    tree 1 = ";
+    treeio::write_newick(this->gene_tree_, out);
+    out << "end;\n";
 
     // calculate the likelihood
     out << "begin paup;\n    set crit=likelihood;\n    lset userbr nst=1 rmatrix=estimate basefreq=equal rates=equal pinvar=0;\n    lscore;\nend;\n";
