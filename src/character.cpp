@@ -212,6 +212,7 @@ void NucleotideAlignment::write_states_as_symbols(
     //         std::ostream_iterator<double>(out, ""));
 }
 
+
 //////////////////////////////////////////////////////////////////////////////
 // ShortReadSequences
 

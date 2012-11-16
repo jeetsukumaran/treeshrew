@@ -21,6 +21,7 @@ class StateSpace {
                 );
         void dispose_gene_tree();
         void dispose_alignment();
+        double calc_ln_probability_of_short_reads();
         void write_phylogenetic_data(std::ostream&);
         inline GeneTree * get_gene_tree() {
             return this->gene_tree_;

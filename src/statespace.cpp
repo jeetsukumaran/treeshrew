@@ -67,6 +67,23 @@ void StateSpace::dispose_alignment() {
     this->alignment_.clear();
 }
 
+double StateSpace::calc_ln_probability_of_short_reads() {
+    double ln_prob = 0.0;
+    for (auto sri = this->short_reads_.cbegin(); sri != this->short_reads_.cend(); ++sri) {
+        const ShortReadSequence& short_read = *sri;
+        double sub_prob = 0.0;
+        for (auto ndi = this->gene_tree_->leaf_begin(); ndi != this->gene_tree_->leaf_end(); ++ndi) {
+            GeneNodeData& gnd = *ndi;
+            sub_prob += short_read.calc_probability_of_sequence(
+                    this->alignment_.sequence_states_cbegin(&gnd),
+                    this->alignment_.sequence_states_cend(&gnd),
+                    0.5);
+        }
+        ln_prob += std::log(sub_prob);
+    }
+    return ln_prob;
+}
+
 void StateSpace::write_phylogenetic_data(std::ostream& out) {
     out << "#NEXUS\n\n";
 

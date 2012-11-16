@@ -228,7 +228,7 @@ class ShortReadSequence {
         inline double calc_probability_of_sequence(
                 const CharacterStateVectorType::const_iterator& long_read_begin,
                 const CharacterStateVectorType::const_iterator& long_read_end,
-                const NucleotideSequence * long_read, double error_probability) {
+                double error_probability) const {
             CharacterStateVectorType::const_iterator start_pos = long_read_begin;
             CharacterStateVectorType::const_iterator stop_pos = long_read_end - this->size_ + 1;
             assert(stop_pos >= start_pos);
@@ -242,7 +242,8 @@ class ShortReadSequence {
                 prob += gsl_ran_binomial_pdf(num_mismatches, error_probability, this->size_);
                 ++start_pos;
             }
-            return std::log(prob);
+            // return std::log(prob);
+            return prob;
         }
 
     private:
@@ -263,6 +264,27 @@ class ShortReadSequences {
         ShortReadSequences();
         ~ShortReadSequences();
         void set(const NucleotideSequences& data);
+        inline unsigned long size() const {
+            return this->short_reads_.size();
+        }
+        // inline const std::vector<ShortReadSequence>::iterator begin() const {
+        //     return this->short_reads_.begin();
+        // }
+        // inline const std::vector<ShortReadSequence>::iterator end() const {
+        //     return this->short_reads_.end();
+        // }
+        inline std::vector<ShortReadSequence>::iterator begin() {
+            return this->short_reads_.begin();
+        }
+        inline std::vector<ShortReadSequence>::iterator end() {
+            return this->short_reads_.end();
+        }
+        inline const std::vector<ShortReadSequence>::const_iterator cbegin() const {
+            return this->short_reads_.cbegin();
+        }
+        inline const std::vector<ShortReadSequence>::const_iterator cend() const {
+            return this->short_reads_.cend();
+        }
 
     private:
         unsigned long                           max_short_read_length_;
@@ -313,6 +335,18 @@ class NucleotideAlignment {
         }
         inline const double * get_partials_data(GeneNodeData * gene_node_data) const {
             return this->node_data_sequence_map_.find(gene_node_data)->second->partials_data();
+        }
+        inline CharacterStateVectorType::iterator sequence_states_begin(GeneNodeData * gene_node_data) const {
+            return this->node_data_sequence_map_.find(gene_node_data)->second->begin();
+        }
+        inline CharacterStateVectorType::iterator sequence_states_end(GeneNodeData * gene_node_data) const {
+            return this->node_data_sequence_map_.find(gene_node_data)->second->begin() + this->num_active_sites_;
+        }
+        inline CharacterStateVectorType::const_iterator sequence_states_cbegin(GeneNodeData * gene_node_data) const {
+            return this->node_data_sequence_map_.find(gene_node_data)->second->cbegin();
+        }
+        inline CharacterStateVectorType::const_iterator sequence_states_cend(GeneNodeData * gene_node_data) const {
+            return this->node_data_sequence_map_.find(gene_node_data)->second->cbegin() + this->num_active_sites_;
         }
         void write_states_as_symbols(GeneNodeData * gene_node_data, std::ostream& out) const;
 
