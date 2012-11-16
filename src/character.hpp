@@ -165,6 +165,9 @@ class NucleotideSequences {
         inline const std::vector<NucleotideSequence *>::const_iterator cend() const {
             return this->sequences_.cend();
         }
+        inline unsigned long size() const {
+            return this->sequences_.size();
+        }
         inline NucleotideSequence * new_sequence(const std::string& label) {
             NucleotideSequence * v = new NucleotideSequence(label);
             this->sequences_.push_back(v);
@@ -195,7 +198,6 @@ class NucleotideSequences {
     protected:
         std::vector<NucleotideSequence *>               sequences_;
         std::map<std::string, NucleotideSequence *>     label_sequence_map_;
-
 
 }; // NucleotideSequences
 
@@ -241,6 +243,22 @@ class ShortReadSequence {
         unsigned long                               size_;
 
 }; // ShortReadSequence
+
+//////////////////////////////////////////////////////////////////////////////
+// ShortReadSequences
+
+class ShortReadSequences {
+
+    public:
+        ShortReadSequences();
+        ~ShortReadSequences();
+        void set(const NucleotideSequences& data);
+
+    private:
+        unsigned long                           max_short_read_length_;
+        std::vector<ShortReadSequence>          short_reads_;
+
+}; // ShortReadSequences
 
 //////////////////////////////////////////////////////////////////////////////
 // NucleotideAlignment

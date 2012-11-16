@@ -212,6 +212,30 @@ void NucleotideAlignment::write_states_as_symbols(
     //         std::ostream_iterator<double>(out, ""));
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// ShortReadSequences
+
+ShortReadSequences::ShortReadSequences()
+    : max_short_read_length_(0) {
+}
+
+ShortReadSequences::~ShortReadSequences() {
+}
+
+void ShortReadSequences::set(const NucleotideSequences& data) {
+    this->short_reads_.reserve(data.size());
+    for (std::vector<NucleotideSequence *>::const_iterator si = data.cbegin();
+            si != data.cend();
+            ++si) {
+        NucleotideSequence * seq = *si;
+    // for (auto seq : data) {
+        this->short_reads_.emplace_back(*seq);
+        if (seq->size() > this->max_short_read_length_) {
+            this->max_short_read_length_ = seq->size();
+        }
+    }
+}
+
 } // namespace treeshrew
 
 

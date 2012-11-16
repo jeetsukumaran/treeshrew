@@ -15,6 +15,12 @@ StateSpace::~StateSpace() {
     this->dispose_alignment();
 }
 
+void StateSpace::load_short_reads(std::istream& src,
+        const std::string& format) {
+    NucleotideSequences dna;
+    sequenceio::read_from_stream(dna, src, format);
+}
+
 void StateSpace::initialize_with_tree_and_alignment(
         std::istream& tree_src,
         std::istream& alignment_src,

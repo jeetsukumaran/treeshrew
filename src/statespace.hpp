@@ -12,6 +12,7 @@ class StateSpace {
     public:
         StateSpace(unsigned long max_sequences, unsigned long max_sites);
         ~StateSpace();
+        void load_short_reads(std::istream& src, const std::string& format="fasta");
         void initialize_with_tree_and_alignment(
                 std::istream& tree_src,
                 std::istream& alignment_src,
@@ -26,6 +27,7 @@ class StateSpace {
         }
 
     private:
+        ShortReadSequences                  short_reads_;
         NucleotideAlignment                 alignment_;
         GeneTree *                          gene_tree_;
 
