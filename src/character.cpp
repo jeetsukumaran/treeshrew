@@ -112,6 +112,15 @@ void NucleotideSequence::write_states_as_symbols(std::ostream& out) const {
         out << this->state_to_symbol_map_.find(s)->second;
     }
 }
+
+void NucleotideSequence::write_states_as_symbols(std::ostream& out,
+    const CharacterStateVectorType::const_iterator& begin,
+    const CharacterStateVectorType::const_iterator& end) const {
+    for (auto iter = begin; iter != end; ++iter) {
+        out << this->state_to_symbol_map_.find(*iter)->second;
+    }
+}
+
 std::string NucleotideSequence::get_states_as_symbols() const {
     std::ostringstream out;
     this->write_states_as_symbols(out);
@@ -197,9 +206,10 @@ void NucleotideAlignment::write_states_as_symbols(
     auto si = this->node_data_sequence_map_.find(gene_node_data);
     TREESHREW_NDEBUG_ASSERT(si != this->node_data_sequence_map_.end());
     NucleotideSequence * seq = si->second;
-    std::copy(seq->cbegin(),
-            seq->cbegin() + this->num_active_sites_,
-            std::ostream_iterator<double>(out, ""));
+    seq->write_states_as_symbols(out, seq->cbegin(), seq->cbegin()+this->num_active_sites_);
+    // std::copy(seq->cbegin(),
+    //         seq->cbegin() + this->num_active_sites_,
+    //         std::ostream_iterator<double>(out, ""));
 }
 
 } // namespace treeshrew

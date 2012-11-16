@@ -76,7 +76,7 @@ void StateSpace::write_phylogenetic_data(std::ostream& out) {
         this->alignment_.write_states_as_symbols(&(*ndi), out);
         out << "\n";
     }
-    out << "end;\n";
+    out << "    ;\nend;\n";
 
     // calculate the likelihood
     out << "begin paup;\n    set crit=likelihood;\n    lset userbr nst=1 rmatrix=estimate basefreq=equal rates=equal pinvar=0;\n    lscore;\nend;\n";

@@ -107,6 +107,9 @@ class NucleotideSequence {
         }
 
         void write_states_as_symbols(std::ostream& out) const;
+        void write_states_as_symbols(std::ostream& out,
+                const CharacterStateVectorType::const_iterator& begin,
+                const CharacterStateVectorType::const_iterator& end) const;
         std::string get_states_as_symbols() const;
 
     protected:
