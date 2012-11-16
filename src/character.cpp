@@ -159,6 +159,28 @@ void NucleotideSequences::set_tip_data(GeneTree * gene_tree) {
     }
 }
 
+void NucleotideSequences::read_fasta(std::ifstream& src) {
+    unsigned long line_idx = 0;
+    NucleotideSequence * seq = nullptr;
+    for(std::string line; std::getline(src, line); ++line_idx) {
+        if (line.empty()) {
+            continue;
+        }
+        if (line[0] == '>') {
+            seq = this->new_sequence(line.substr(1, line.size()));
+        } else {
+            for (auto & c : line) {
+                if (!seq) {
+                    treeshrew_abort("Expecting sequence label (i.e., line starting with '>')");
+                }
+                if (!std::isspace(c)) {
+                    seq->append_state_by_symbol(c);
+                }
+            }
+        }
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // NucleotideAlignment
 

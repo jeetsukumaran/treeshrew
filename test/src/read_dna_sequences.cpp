@@ -26,7 +26,9 @@ int main(int argc, char * argv[]) {
     // treeshrew::NucleotideSequences * dna = treeshrew::create_sequences_from_filepath<treeshrew::NucleotideSequences>(filepath, format);
     // dna->write_fasta(std::cout);
     treeshrew::NucleotideSequences dna;
-    treeshrew::sequenceio::read_from_filepath(dna, filepath, format);
+    std::ifstream src(filepath);
+    dna.read_fasta(src);
+    // treeshrew::sequenceio::read_from_filepath(dna, filepath, format);
     for (auto & seq : dna) {
         std::cout << seq->get_label() << ":";
         std::copy(seq->partials_cbegin(), seq->partials_cend(), std::ostream_iterator<double>(std::cout, ";"));
