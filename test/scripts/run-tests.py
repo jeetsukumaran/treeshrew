@@ -384,7 +384,8 @@ class TestRunner(object):
         dna_matrix = dendropy.DnaCharacterMatrix.get_from_path(datafile, "fasta", row_type="STR")
         expected_partials = {}
         for taxon in dna_matrix:
-            label = taxon.label.replace(" ", "_")
+            # label = taxon.label.replace(" ", "_")
+            label = taxon.label
             expected_partials[label] = []
             states = dna_matrix[taxon]
             for state in states:

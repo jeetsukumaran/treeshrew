@@ -46,7 +46,8 @@ int read_from_stream(
     }
     unsigned int ntax = taxa_block->GetNTaxTotal();
     for (unsigned int taxon_idx = 0; taxon_idx < ntax; ++taxon_idx) {
-        const char * label = NxsString::GetEscaped(taxa_block->GetTaxonLabel(taxon_idx)).c_str();
+        // const char * label = NxsString::GetEscaped(taxa_block->GetTaxonLabel(taxon_idx)).c_str();
+        const char * label = taxa_block->GetTaxonLabel(taxon_idx).c_str();
         NxsDiscreteStateRow row = chars_block->GetDiscreteMatrixRow(taxon_idx);
         // seqs->reserve(row.size());
         std::ostringstream o;
@@ -143,7 +144,8 @@ int construct_tree(
             treeshrew_abort("Tree has node with only 1 child");
         } else if (nchildren == 0) {
             unsigned int ncl_taxon_idx = ncl_node->GetTaxonIndex();
-            label = NxsString::GetEscaped(tb->GetTaxonLabel(ncl_taxon_idx)).c_str();
+            // label = NxsString::GetEscaped(tb->GetTaxonLabel(ncl_taxon_idx)).c_str();
+            label = tb->GetTaxonLabel(ncl_taxon_idx).c_str();
             new_node = ttree->allocate_leaf_node();
         } else if (nchildren == 2) {
             label = NxsString::GetEscaped(ncl_node->GetName()).c_str();
@@ -253,7 +255,10 @@ void write_newick_node(TreeType * tree, const iter& tree_iter, std::ostream& out
         out << ")";
     } else {
     }
-    out << tree_iter->get_label() << ":" << tree_iter->get_edge_length();
+    // label = NxsString::GetEscaped(tb->GetTaxonLabel(ncl_taxon_idx)).c_str();
+    // out << tree_iter->get_label();
+    out << NxsString::GetEscaped(tree_iter->get_label()).c_str();
+    out << ":" << tree_iter->get_edge_length();
 }
 
 template <class TreeType>
