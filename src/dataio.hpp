@@ -24,6 +24,7 @@ int read_from_stream(
         const std::string& format) {
     MultiFormatReader reader(-1, NxsReader::IGNORE_WARNINGS);
     reader.SetWarningOutputLevel(NxsReader::AMBIGUOUS_CONTENT_WARNING);
+    reader.SetCoerceUnderscoresToSpaces(true);
     const char * format_cstr = nullptr;
     if (format == "phylip" || format == "dnaphylip") {
         format_cstr = "dnarelaxedphylip";
@@ -181,6 +182,7 @@ int read_from_stream(
         unsigned long max_tips=0) {
     MultiFormatReader reader(-1, NxsReader::IGNORE_WARNINGS);
     reader.SetWarningOutputLevel(NxsReader::AMBIGUOUS_CONTENT_WARNING);
+    reader.SetCoerceUnderscoresToSpaces(false);
     const char * format_cstr = nullptr;
     if (format == "newick") {
         format_cstr = "relaxedphyliptree";

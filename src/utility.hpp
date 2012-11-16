@@ -9,6 +9,8 @@ namespace treeshrew {
 //////////////////////////////////////////////////////////////////////////////
 // Asserts
 
+#define TREESHREW_ASSERT_RAISES_EXCEPTION 1
+
 #if defined(IGNORE_TREESHREW_ASSERT) || defined(NDEBUG)
 #   define TREESHREW_ASSERT(expr)
 #   define TREESHREW_ASSERT_APPROX_EQUAL(x, y)

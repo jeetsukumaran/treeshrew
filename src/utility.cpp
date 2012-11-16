@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <iomanip>
 #include <iostream>
 #include "utility.hpp"
@@ -11,7 +12,11 @@ void treeshrew_assertion_failed(char const * expr, char const * function, char c
             "\n  func: " , function,
             "\n  file: " , file,
             "\n  line: " , line);
+#ifdef TREESHREW_ASSERT_RAISES_EXCEPTION
+    throw std::runtime_error("Assertion Error");
+#else
     std::exit(1);
+#endif
 }
 
 void treeshrew_assert_approx_eq_failed(char const * x,
@@ -27,7 +32,11 @@ void treeshrew_assert_approx_eq_failed(char const * x,
             "\n  func: " , function,
             "\n  file: " , file,
             "\n  line: " , line);
+#ifdef TREESHREW_ASSERT_RAISES_EXCEPTION
+    throw std::runtime_error("Assertion Error");
+#else
     std::exit(1);
+#endif
 }
 
 } // namespace treeshrew

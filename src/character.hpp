@@ -180,6 +180,16 @@ class NucleotideSequences {
         }
         inline NucleotideSequence * get_sequence(const std::string& label) const {
             auto label_sequence = this->label_sequence_map_.find(label);
+            // if (label_sequence == this->label_sequence_map_.end()) {
+            //     std::cerr << "Current label set: ";
+            //     for (auto & m : this->label_sequence_map_) {
+            //         std::cerr << "'" << m.first << "', ";
+            //     }
+            //     std::cerr << std::endl;
+            //     treeshrew_abort("Sequence for label '",
+            //             label,
+            //             "' not found");
+            // }
             TREESHREW_ASSERT(label_sequence != this->label_sequence_map_.end());
             return label_sequence->second;
         }
