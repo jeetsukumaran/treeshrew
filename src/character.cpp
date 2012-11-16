@@ -159,7 +159,7 @@ void NucleotideSequences::set_tip_data(GeneTree * gene_tree) {
     }
 }
 
-void NucleotideSequences::read_fasta(std::ifstream& src) {
+void NucleotideSequences::read_fasta(std::istream& src) {
     unsigned long line_idx = 0;
     NucleotideSequence * seq = nullptr;
     for(std::string line; std::getline(src, line); ++line_idx) {

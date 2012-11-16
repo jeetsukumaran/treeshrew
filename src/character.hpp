@@ -204,7 +204,7 @@ class NucleotideSequences {
             }
         }
         void set_tip_data(GeneTree * gene_tree);
-        void read_fasta(std::ifstream& src);
+        void read_fasta(std::istream& src);
 
     protected:
         std::vector<NucleotideSequence *>               sequences_;

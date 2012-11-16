@@ -15,10 +15,9 @@ StateSpace::~StateSpace() {
     this->dispose_alignment();
 }
 
-void StateSpace::load_short_reads(std::istream& src,
-        const std::string& format) {
+void StateSpace::load_short_reads(std::istream& src) {
     NucleotideSequences dna;
-    sequenceio::read_from_stream(dna, src, format);
+    dna.read_fasta(src);
     for (auto & seq : dna) {
         this->short_reads_.add(*seq);
     }
