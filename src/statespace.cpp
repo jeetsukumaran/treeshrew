@@ -19,6 +19,9 @@ void StateSpace::load_short_reads(std::istream& src,
         const std::string& format) {
     NucleotideSequences dna;
     sequenceio::read_from_stream(dna, src, format);
+    for (auto & seq : dna) {
+        this->short_reads_.add(*seq);
+    }
 }
 
 void StateSpace::initialize_with_tree_and_alignment(
@@ -79,6 +82,7 @@ double StateSpace::calc_ln_probability_of_short_reads() {
                     this->alignment_.sequence_states_cend(&gnd),
                     0.5);
         }
+        std::cerr << "*** " << sub_prob << std::endl;
         ln_prob += std::log(sub_prob);
     }
     return ln_prob;

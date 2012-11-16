@@ -267,12 +267,6 @@ class ShortReadSequences {
         inline unsigned long size() const {
             return this->short_reads_.size();
         }
-        // inline const std::vector<ShortReadSequence>::iterator begin() const {
-        //     return this->short_reads_.begin();
-        // }
-        // inline const std::vector<ShortReadSequence>::iterator end() const {
-        //     return this->short_reads_.end();
-        // }
         inline std::vector<ShortReadSequence>::iterator begin() {
             return this->short_reads_.begin();
         }
@@ -284,6 +278,9 @@ class ShortReadSequences {
         }
         inline const std::vector<ShortReadSequence>::const_iterator cend() const {
             return this->short_reads_.cend();
+        }
+        inline void add(const NucleotideSequence& seq) {
+            this->short_reads_.emplace_back(seq);
         }
 
     private:
