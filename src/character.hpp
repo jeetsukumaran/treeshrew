@@ -78,14 +78,14 @@ class NucleotideSequence {
         inline const std::vector<double>::const_iterator partials_cend() const {
             return this->partials_.cend();
         }
-        inline void append_state(CharacterStateType c) {
-            this->sequence_.push_back(c);
-        }
-        inline void append_state_by_symbol(char s) {
-            auto state = NucleotideSequence::get_state_from_symbol(s);
+        inline void append_state(CharacterStateType state) {
             this->sequence_.push_back(state);
             auto state_partials = this->state_to_partials_map_.find(state)->second;
             this->partials_.insert(this->partials_.end(), state_partials.begin(), state_partials.end());
+        }
+        inline void append_state_by_symbol(char s) {
+            auto state = NucleotideSequence::get_state_from_symbol(s);
+            this->append_state(state);
         }
         inline void append_states_by_symbols(const std::string& s) {
             this->sequence_.reserve(this->sequence_.size() + s.size());
