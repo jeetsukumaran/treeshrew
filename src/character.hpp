@@ -240,11 +240,28 @@ class ShortReadSequence {
                         this->begin_, this->end_, start_pos,
                         0, std::plus<unsigned int>(),
                         std::not2(std::equal_to<CharacterStateVectorType::value_type>()));
-                prob += gsl_ran_binomial_pdf(num_mismatches, error_probability, this->size_);
+                // prob += gsl_ran_binomial_pdf(num_mismatches, error_probability, this->size_);
+                prob += gsl_ran_poisson_pdf(num_mismatches, 1.0/0.0107);
                 ++start_pos;
             }
             // return std::log(prob);
             return prob;
+        }
+
+        inline CharacterStateVectorType::const_iterator begin() {
+            return this->begin_;
+        }
+        inline CharacterStateVectorType::const_iterator end() {
+            return this->end_;
+        }
+        inline const CharacterStateVectorType::const_iterator cbegin() const {
+            return this->begin_;
+        }
+        inline const CharacterStateVectorType::const_iterator cend() const {
+            return this->end_;
+        }
+        inline unsigned long size() const {
+            return this->size_;
         }
 
     private:
@@ -345,6 +362,35 @@ class NucleotideAlignment {
         }
         inline CharacterStateVectorType::const_iterator sequence_states_cend(GeneNodeData * gene_node_data) const {
             return this->node_data_sequence_map_.find(gene_node_data)->second->cbegin() + this->num_active_sites_;
+        }
+        inline double calc_probability_of_sequence(
+                GeneNodeData * gene_node_data,
+                const ShortReadSequence& short_read,
+                double error_probability) const {
+            auto siter = this->node_data_sequence_map_.find(gene_node_data);
+            TREESHREW_ASSERT(siter != this->node_data_sequence_map_.end());
+            NucleotideSequence * seq = siter->second;
+            CharacterStateVectorType::const_iterator long_read_start_pos = seq->cbegin();
+            CharacterStateVectorType::const_iterator long_read_stop_pos = long_read_start_pos + this->num_active_sites_ - short_read.size() + 1;
+            CharacterStateVectorType::const_iterator short_read_begin = short_read.cbegin();
+            CharacterStateVectorType::const_iterator short_read_end = short_read.cend();
+            TREESHREW_ASSERT(long_read_stop_pos >= long_read_start_pos);
+            unsigned long num_mismatches = 0;
+            double prob = 0.0;
+            while (long_read_start_pos < long_read_stop_pos) {
+                num_mismatches = std::inner_product(
+                        short_read_begin,
+                        short_read_end,
+                        long_read_start_pos,
+                        0,
+                        std::plus<unsigned int>(),
+                        std::not2(std::equal_to<CharacterStateVectorType::value_type>()));
+                // prob += gsl_ran_binomial_pdf(num_mismatches, error_probability, this->size_);
+                prob += gsl_ran_poisson_pdf(num_mismatches, 1.0/0.0107);
+                ++long_read_start_pos;
+            }
+            // return std::log(prob);
+            return prob;
         }
         void write_states_as_symbols(GeneNodeData * gene_node_data, std::ostream& out) const;
 

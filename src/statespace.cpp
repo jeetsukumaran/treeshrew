@@ -76,10 +76,11 @@ double StateSpace::calc_ln_probability_of_short_reads() {
         double sub_prob = 0.0;
         for (auto ndi = this->gene_tree_->leaf_begin(); ndi != this->gene_tree_->leaf_end(); ++ndi) {
             GeneNodeData& gnd = *ndi;
-            sub_prob += short_read.calc_probability_of_sequence(
-                    this->alignment_.sequence_states_cbegin(&gnd),
-                    this->alignment_.sequence_states_cend(&gnd),
-                    0.5);
+            // sub_prob += short_read.calc_probability_of_sequence(
+            //         this->alignment_.sequence_states_cbegin(&gnd),
+            //         this->alignment_.sequence_states_cend(&gnd),
+            //         0.5);
+            sub_prob += this->alignment_.calc_probability_of_sequence(&gnd, short_read, 0.5);
         }
         std::cerr << "*** " << sub_prob << std::endl;
         ln_prob += std::log(sub_prob);
