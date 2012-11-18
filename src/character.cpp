@@ -127,6 +127,33 @@ std::string NucleotideSequence::get_states_as_symbols() const {
     return out.str();
 }
 
+static std::vector<NucleotideSequence> read_fasta(std::istream& src) {
+    unsigned long line_idx = 0;
+    std::vector<NucleotideSequence> seqs;
+    NucleotideSequence * seq = nullptr;
+    for(std::string line; std::getline(src, line); ++line_idx) {
+        if (line.empty()) {
+            continue;
+        }
+        if (line[0] == '>') {
+            seqs.emplace_back(line.substr(1, line.size()));
+            seq = &(seqs.back());
+        } else {
+            for (auto & c : line) {
+                if (seq == nullptr) {
+                    treeshrew_abort("FASTA file read error: Line ",
+                            line_idx+1,
+                            "Expecting sequence label (i.e., line starting with '>')");
+                }
+                if (!std::isspace(c)) {
+                    seq->append_state_by_symbol(c);
+                }
+            }
+        }
+    }
+    return seqs;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // NucleotideSequences
 

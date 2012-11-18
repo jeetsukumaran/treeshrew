@@ -141,6 +141,7 @@ class NucleotideSequence {
             }
             return symbol_lookup->second;
         }
+        static std::vector<NucleotideSequence> read_fasta(std::istream& src);
 
 }; // NucleotideSequence
 
