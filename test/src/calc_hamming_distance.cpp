@@ -6,6 +6,18 @@
 
 using namespace treeshrew;
 
+// int main() {
+//     GeneNodeData gnd;
+//     NucleotideSequence sr_seq;
+//     sr_seq.append_states_by_symbols("AACCGGTT");
+//     ShortReadSequence short_read(sr_seq);
+//     NucleotideSequence lr_seq;
+//     lr_seq.append_states_by_symbols("AACCGGTT");
+//     NucleotideAlignment a(8, 8);
+//     a.new_sequence(&gnd, &lr_seq);
+//     std::cout << std::log(a.calc_probability_of_sequence(&gnd, short_read, 0.5)) << std::endl;
+// }
+
 void get_sliding_windows(
         std::vector<CharacterStateVectorType>& window_sets,
         const CharacterStateVectorType& short_read,

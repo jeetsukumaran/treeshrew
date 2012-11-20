@@ -375,6 +375,7 @@ class NucleotideAlignment {
             CharacterStateVectorType::const_iterator long_read_stop_pos = long_read_start_pos + this->num_active_sites_ - short_read.size() + 1;
             CharacterStateVectorType::const_iterator short_read_begin = short_read.cbegin();
             CharacterStateVectorType::const_iterator short_read_end = short_read.cend();
+            unsigned long short_read_size = short_read.size();
             TREESHREW_ASSERT(long_read_stop_pos >= long_read_start_pos);
             unsigned long num_mismatches = 0;
             double prob = 0.0;
@@ -386,11 +387,10 @@ class NucleotideAlignment {
                         0,
                         std::plus<unsigned int>(),
                         std::not2(std::equal_to<CharacterStateVectorType::value_type>()));
-                // prob += gsl_ran_binomial_pdf(num_mismatches, error_probability, this->size_);
-                prob += gsl_ran_poisson_pdf(num_mismatches, 1.0/0.0107);
+                // prob += gsl_ran_binomial_pdf(num_mismatches, error_probability, short_read_size);
+                prob += gsl_ran_poisson_pdf(num_mismatches, (error_probability * short_read_size));
                 ++long_read_start_pos;
             }
-            // return std::log(prob);
             return prob;
         }
         void write_states_as_symbols(GeneNodeData * gene_node_data, std::ostream& out) const;
