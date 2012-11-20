@@ -398,6 +398,9 @@ class NucleotideAlignment {
     protected:
         void set_sequence_states(NucleotideSequence * seq, const NucleotideSequence * src_seq) {
             unsigned long len = src_seq->size();
+            if (len > this->max_sites_) {
+                treeshrew_abort("Sequence length of ", len, " exceeds maximum allocated number of sites per sequence, ", this->max_sites_);
+            }
             if (len > this->num_active_sites_) {
                 this->num_active_sites_ = len;
             }

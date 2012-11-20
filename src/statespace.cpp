@@ -82,7 +82,7 @@ double StateSpace::calc_ln_probability_of_short_reads() {
             //         0.5);
             sub_prob += this->alignment_.calc_probability_of_sequence(&gnd, short_read, 0.5);
         }
-        std::cerr << "*** " << sub_prob << std::endl;
+        // std::cerr << "*** " << sub_prob << std::endl;
         ln_prob += std::log(sub_prob);
     }
     return ln_prob;
