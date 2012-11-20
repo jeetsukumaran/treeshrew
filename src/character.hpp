@@ -230,7 +230,7 @@ class ShortReadSequence {
         inline double calc_probability_of_sequence(
                 const CharacterStateVectorType::const_iterator& long_read_begin,
                 const CharacterStateVectorType::const_iterator& long_read_end,
-                double error_probability) const {
+                double mean_number_of_errors_per_site) const {
             CharacterStateVectorType::const_iterator start_pos = long_read_begin;
             CharacterStateVectorType::const_iterator stop_pos = long_read_end - this->size_ + 1;
             assert(stop_pos >= start_pos);
@@ -241,7 +241,7 @@ class ShortReadSequence {
                         this->begin_, this->end_, start_pos,
                         0, std::plus<unsigned int>(),
                         std::not2(std::equal_to<CharacterStateVectorType::value_type>()));
-                // prob += gsl_ran_binomial_pdf(num_mismatches, error_probability, this->size_);
+                // prob += gsl_ran_binomial_pdf(num_mismatches, mean_number_of_errors_per_site, this->size_);
                 prob += gsl_ran_poisson_pdf(num_mismatches, 1.0/0.0107);
                 ++start_pos;
             }
@@ -367,7 +367,7 @@ class NucleotideAlignment {
         inline double calc_probability_of_sequence(
                 GeneNodeData * gene_node_data,
                 const ShortReadSequence& short_read,
-                double error_probability) const {
+                double mean_number_of_errors_per_site) const {
             auto siter = this->node_data_sequence_map_.find(gene_node_data);
             TREESHREW_ASSERT(siter != this->node_data_sequence_map_.end());
             NucleotideSequence * seq = siter->second;
@@ -387,8 +387,8 @@ class NucleotideAlignment {
                         0,
                         std::plus<unsigned int>(),
                         std::not2(std::equal_to<CharacterStateVectorType::value_type>()));
-                // prob += gsl_ran_binomial_pdf(num_mismatches, error_probability, short_read_size);
-                prob += gsl_ran_poisson_pdf(num_mismatches, (error_probability * short_read_size));
+                // prob += gsl_ran_binomial_pdf(num_mismatches, mean_number_of_errors_per_site, short_read_size);
+                prob += gsl_ran_poisson_pdf(num_mismatches, (mean_number_of_errors_per_site * short_read_size));
                 ++long_read_start_pos;
             }
             return prob;
