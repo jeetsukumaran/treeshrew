@@ -371,6 +371,13 @@ class NucleotideAlignment {
             auto siter = this->node_data_sequence_map_.find(gene_node_data);
             TREESHREW_ASSERT(siter != this->node_data_sequence_map_.end());
             NucleotideSequence * seq = siter->second;
+            return this->calc_probability_of_sequence(seq, short_read, mean_number_of_errors_per_site);
+        }
+        inline double calc_probability_of_sequence(
+                NucleotideSequence * seq,
+                const ShortReadSequence& short_read,
+                double mean_number_of_errors_per_site) const {
+            TREESHREW_ASSERT(seq);
             CharacterStateVectorType::const_iterator long_read_start_pos = seq->cbegin();
             CharacterStateVectorType::const_iterator long_read_stop_pos = long_read_start_pos + this->num_active_sites_ - short_read.size() + 1;
             CharacterStateVectorType::const_iterator short_read_begin = short_read.cbegin();
@@ -387,8 +394,8 @@ class NucleotideAlignment {
                         0,
                         std::plus<unsigned int>(),
                         std::not2(std::equal_to<CharacterStateVectorType::value_type>()));
-                // prob += gsl_ran_binomial_pdf(num_mismatches, mean_number_of_errors_per_site, short_read_size);
-                prob += gsl_ran_poisson_pdf(num_mismatches, (mean_number_of_errors_per_site * short_read_size));
+                prob += gsl_ran_binomial_pdf(num_mismatches, mean_number_of_errors_per_site, short_read_size);
+                // prob += gsl_ran_poisson_pdf(num_mismatches, (mean_number_of_errors_per_site * short_read_size));
                 ++long_read_start_pos;
             }
             return prob;
